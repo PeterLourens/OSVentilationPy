@@ -1,0 +1,312 @@
+{
+    "valve0": [
+        {
+            "name": "HR Kap"
+        }
+    ],
+    "valve1": [
+        {
+            "name": "Keuken"
+        }
+    ],
+    "valve2": [
+        {
+            "name": "Toilet"
+        }
+    ],
+    "valve3": [
+        {
+            "name": "Not used"
+        }
+    ],
+    "valve4": [
+        {
+            "name": "Not used"
+        }
+    ],
+    "valve5": [
+        {
+            "name": "Wasruimte"
+        }
+    ],
+    "valve6": [
+        {
+            "name": "Badkamer"
+        }
+    ],
+    "valve7": [
+        {
+            "name": "Not used"
+        }
+    ],
+    "valve8": [
+        {
+            "name": "Slaapkamer1"
+        }
+    ],
+    "valve9": [
+        {
+            "name": "Slaapkamer2"
+        }
+    ],
+    "valve10": [
+        {
+            "name": "Slaapkamer3"
+        }
+    ],
+    "valve11": [
+        {
+            "name": "Slaapkamer4"
+        }
+    ],
+
+    "stateTransitions": [
+        {
+            "id": 0,
+            "state": "start",
+            "event": "",
+            "newState": "init",
+            "fan speed": "low",
+            "valve0Position": 4,
+            "valve1Position": 4,
+            "valve2Position": 4,
+            "valve3Position": 0,
+            "valve4Position": 0,
+            "valve5Position": 4,
+            "valve6Position": 24,
+            "valve7Position": 0,
+            "valve8Position": 4,
+            "valve9Position": 4,
+            "valve10Position": 4,
+            "valve11Position": 4
+        },
+        {
+            "id": 1,
+            "state": "init",
+            "event": "After 7:00 or 8:00",
+            "newState": "day",
+            "fan speed": "medium",
+            "valve0Position": 4,
+            "valve1Position": 4,
+            "valve2Position": 4,
+            "valve3Position": 0,
+            "valve4Position": 0,
+            "valve5Position": 4,
+            "valve6Position": 24,
+            "valve7Position": 0,
+            "valve8Position": 4,
+            "valve9Position": 4,
+            "valve10Position": 4,
+            "valve11Position": 4
+        },
+        {
+            "id": 2,
+            "state": "init",
+            "event": "After 21:00",
+            "newState": "night",
+            "fan speed": "low",
+            "valve0Position": 4,
+            "valve1Position": 4,
+            "valve2Position": 4,
+            "valve3Position": 0,
+            "valve4Position": 0,
+            "valve5Position": 4,
+            "valve6Position": 24,
+            "valve7Position": 0,
+            "valve8Position": 4,
+            "valve9Position": 4,
+            "valve10Position": 4,
+            "valve11Position": 4
+        },
+        {
+            "id": 3,
+            "state": "day",
+            "event": "After 21:00",
+            "newState": "night",
+            "fan speed": "low",
+            "valve0Position": 4,
+            "valve1Position": 4,
+            "valve2Position": 4,
+            "valve3Position": 0,
+            "valve4Position": 0,
+            "valve5Position": 4,
+            "valve6Position": 24,
+            "valve7Position": 0,
+            "valve8Position": 4,
+            "valve9Position": 4,
+            "valve10Position": 4,
+            "valve11Position": 4
+        },
+        {
+            "id": 4,
+            "state": "night",
+            "event": "After 7:00 or 8:00",
+            "newState": "day",
+            "fan speed": "medium",
+            "valve0Position": 4,
+            "valve1Position": 4,
+            "valve2Position": 4,
+            "valve3Position": 0,
+            "valve4Position": 0,
+            "valve5Position": 4,
+            "valve6Position": 24,
+            "valve7Position": 0,
+            "valve8Position": 4,
+            "valve9Position": 4,
+            "valve10Position": 4,
+            "valve11Position": 4
+        },
+        {
+            "id": 5,
+            "state": "day",
+            "event": "CO2 > 900ppm",
+            "newState": "high CO2 day",
+            "fan speed": "high",
+            "valve0Position": 4,
+            "valve1Position": 4,
+            "valve2Position": 4,
+            "valve3Position": 0,
+            "valve4Position": 0,
+            "valve5Position": 4,
+            "valve6Position": 24,
+            "valve7Position": 0,
+            "valve8Position": 4,
+            "valve9Position": 4,
+            "valve10Position": 4,
+            "valve11Position": 4
+        },
+        {
+            "id": 6,
+            "state": "high CO2 day",
+            "event": "CO2 < 700ppm",
+            "newState": "day",
+            "fan speed": "medium",
+            "valve0Position": 4,
+            "valve1Position": 4,
+            "valve2Position": 4,
+            "valve3Position": 0,
+            "valve4Position": 0,
+            "valve5Position": 4,
+            "valve6Position": 24,
+            "valve7Position": 0,
+            "valve8Position": 4,
+            "valve9Position": 4,
+            "valve10Position": 4,
+            "valve11Position": 4
+        },
+        {
+            "id": 7,
+            "state": "night",
+            "event": "CO2 > 900ppm",
+            "newState": "high CO2 night",
+            "fan speed": "low",
+            "valve0Position": 4,
+            "valve1Position": 4,
+            "valve2Position": 4,
+            "valve3Position": 0,
+            "valve4Position": 0,
+            "valve5Position": 4,
+            "valve6Position": 24,
+            "valve7Position": 0,
+            "valve8Position": 20,
+            "valve9Position": 20,
+            "valve10Position": 20,
+            "valve11Position": 20
+        },
+        {
+            "id": 8,
+            "state": "high CO2 night",
+            "event": "CO2 < 700ppm",
+            "newState": "night",
+            "fan speed": "low",
+            "valve0Position": 4,
+            "valve1Position": 4,
+            "valve2Position": 4,
+            "valve3Position": 0,
+            "valve4Position": 0,
+            "valve5Position": 4,
+            "valve6Position": 24,
+            "valve7Position": 0,
+            "valve8Position": 4,
+            "valve9Position": 4,
+            "valve10Position": 4,
+            "valve11Position": 4
+        },
+        {
+            "id": 9,
+            "state": "high CO2 night",
+            "event": "After 7:00 or 8:00",
+            "newState": "high CO2 day",
+            "fan speed": "low",
+            "valve0Position": 4,
+            "valve1Position": 4,
+            "valve2Position": 4,
+            "valve3Position": 0,
+            "valve4Position": 0,
+            "valve5Position": 4,
+            "valve6Position": 24,
+            "valve7Position": 0,
+            "valve8Position": 4,
+            "valve9Position": 4,
+            "valve10Position": 4,
+            "valve11Position": 4
+        },
+        {
+            "id": 10,
+            "state": "high CO2 day",
+            "event": "After 21:00",
+            "newState": "night",
+            "fan speed": "low",
+            "valve0Position": 4,
+            "valve1Position": 4,
+            "valve2Position": 4,
+            "valve3Position": 0,
+            "valve4Position": 0,
+            "valve5Position": 4,
+            "valve6Position": 24,
+            "valve7Position": 0,
+            "valve8Position": 20,
+            "valve9Position": 20,
+            "valve10Position": 20,
+            "valve11Position": 20
+        },
+        {
+            "id": 11,
+            "state": "day",
+            "event": "RH > 90% or dRH/dt > 12",
+            "newState": "high RH day",
+            "fan speed": "high",
+            "valve0Position": 4,
+            "valve1Position": 4,
+            "valve2Position": 4,
+            "valve3Position": 0,
+            "valve4Position": 0,
+            "valve5Position": 4,
+            "valve6Position": 24,
+            "valve7Position": 0,
+            "valve8Position": 4,
+            "valve9Position": 4,
+            "valve10Position": 4,
+            "valve11Position": 4
+        },
+        {
+            "id": 12,
+            "state": "high RH day",
+            "event": "After 45 minutes",
+            "newState": "day",
+            "fan speed": "medium",
+            "valve0Position": 4,
+            "valve1Position": 4,
+            "valve2Position": 4,
+            "valve3Position": 0,
+            "valve4Position": 0,
+            "valve5Position": 4,
+            "valve6Position": 24,
+            "valve7Position": 0,
+            "valve8Position": 4,
+            "valve9Position": 4,
+            "valve10Position": 4,
+            "valve11Position": 4
+        }
+    ]
+}
