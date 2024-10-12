@@ -26,7 +26,7 @@ global stateTransitionMatrix
 #============================================================
 # MQTT Connection
 #============================================================
-qos = 1
+qos = 0
 
 try:
     mqttClient = mqttConnect()
@@ -86,10 +86,19 @@ def init_logic():
     # Referenced global variables
     
     if stateMachine.execute_once:
+        # 
         print("\nMachine in init state")
+        
         # Set all valves to default value
-        setposition = stateMachineMatrix["transition1"]["valve1Position"]
-        print(setposition)
+        for i in range(12):
+            valve = "valve" + str(i) + "Position"
+            requestedPosition = stateMachineMatrix["transition0"][valve]
+            moveValve(requestedPosition, i)
+            clearOutputs()
+            # Publish to mqtt server
+            topic = "OSVentilationPy/position/valve" + str(i)
+            mqttPublish(mqttClient, str(requestedPosition) , topic, int(qos))
+            time.sleep_ms(200)
 
     # Code that executes continously during state
     timeOfDay = evaluateDayOrNight()
@@ -100,10 +109,14 @@ def init_logic():
     topic = "OSVentilationPy/operatingMode/state"
     mqttPublish(mqttClient, state, topic, int(qos))
     
+    # StateMachine can only transition to either "day" or "night" states
     if timeOfDay == "day":
+        print("\nTime of day is:",timeOfDay, ", StateMachine transitions to day")
         stateMachine.force_transition_to(day)
     elif timeOfDay == "night":
+        print("\nTime of day is:",timeOfDay, ", StateMachine transitions to night")
         stateMachine.force_transition_to(night)
+    
 
 def day_logic():
     # Referenced global variables
@@ -120,30 +133,57 @@ def day_logic():
     timeOfDay = evaluateDayOrNight()
     topic = "OSVentilationPy/operatingMode/time"
     mqttPublish(mqttClient, timeOfDay, topic, int(qos))
+    time.sleep_ms(100)
     
     # Publish state of state machine
     state = "day"
     topic = "OSVentilationPy/operatingMode/state"
     mqttPublish(mqttClient, state, topic, int(qos))
+    time.sleep_ms(100)
     
-    #Read sensors, return array with readings
+    #Read sensors, functions return array with readings
     SCD41Reading = readSCD41(scd41)
     DHT22Reading = readDHT22()
 
-    # Dictionary sensorData
+    # Dictionary with sensorData
     sensorData = { "SCD41": { "Temperature": SCD41Reading[0], "RelativeHumidity": SCD41Reading[1], "CO2": SCD41Reading[2]}, "DHT22": {"Temperature": DHT22Reading[0], "RelativeHumidity": DHT22Reading[1]}}
     
     # Iterate through nested dictionary sensorData and publish to MQTT
     for sensorType, measurement in sensorData.items():
         print("\nSensor:", sensorType)
+        time.sleep_ms(200)
     
         for key in measurement:
             #print(key + ':', measurement[key])
             topic = "OSVentilationPy/" + sensorType + "/" + key 
             mqttPublish(mqttClient, str(measurement[key]), topic, int(qos))
+            time.sleep_ms(200)
     
-    if timeOfDay == "night":
+    # Read valve position of requested valve from file and publish valve positions to MQTT
+    with open('valvePositions.json') as f:
+        valvePositions = json.loads(f.read())    
+    
+    for i in range(12):
+        topic = "OSVentilationPy/position/valve" + str(i)
+        valvePosition = valvePositions[("valve" + str(i))]
+        print("\nTopic is:", topic, "ValvePosition is:", valvePosition)
+        mqttPublish(mqttClient, str(valvePosition), topic, int(qos))
+        time.sleep_ms(200)
+    
+    f.close()
+    
+    # Conditions to make transition to other states
+    if timeOfDay == "night" and SCD41Reading[2] <900:
+        print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to night")
         stateMachine.force_transition_to(night)
+    elif timeOfDay == "day" and SCD41Reading[2] >900:
+        print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to highCO2Day")
+        stateMachine.force_transition_to(highCO2Day)
+    elif timeOfDay == "night" and SCD41Reading[2] >900:
+        print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to highCO2Night")
+        stateMachine.force_transition_to(highCO2Night)
+    else:
+        pass
 
 def night_logic():
     # Referenced global variables
@@ -159,11 +199,13 @@ def night_logic():
     timeOfDay = evaluateDayOrNight()
     topic = "OSVentilationPy/operatingMode/time"
     mqttPublish(mqttClient, timeOfDay, topic, int(qos))
+    time.sleep_ms(100)
     
     # Publish state of state machine
     state = "night"
     topic = "OSVentilationPy/operatingMode/state"
     mqttPublish(mqttClient, state, topic, int(qos))
+    time.sleep_ms(100)
     
     #Read sensors, return array with readings
     SCD41Reading = readSCD41(scd41)
@@ -175,20 +217,177 @@ def night_logic():
     # Iterate through nested dictionary sensorData and publish to MQTT
     for sensorType, measurement in sensorData.items():
         print("\nSensor:", sensorType)
+        time.sleep_ms(200)
     
         for key in measurement:
             #print(key + ':', measurement[key])
             topic = "OSVentilationPy/" + sensorType + "/" + key 
             mqttPublish(mqttClient, str(measurement[key]), topic, int(qos))
+            time.sleep_ms(200)
+
+    # Read valve position of requested valve from file and publish valve positions to MQTT
+    with open('valvePositions.json') as f:
+        valvePositions = json.loads(f.read())    
     
-    if timeOfDay == "day":
+    for i in range(12):
+        topic = "OSVentilationPy/position/valve" + str(i)
+        valvePosition = valvePositions[("valve" + str(i))]
+        print("\nTopic is:", topic, "ValvePosition is:", valvePosition)
+        mqttPublish(mqttClient, str(valvePosition), topic, int(qos))
+        time.sleep_ms(200)
+    
+    f.close()
+
+    # Conditions to make transition to other states
+    if timeOfDay == "day" and SCD41Reading[2] <900:
+        print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to day")
         stateMachine.force_transition_to(day)
+    elif timeOfDay == "day" and SCD41Reading[2] >900:
+        print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to highCO2day state")
+        stateMachine.force_transition_to(highCO2Day)
+    elif timeOfDay == "night" and SCD41Reading[2] >900:
+        print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to highCO2night state")
+        stateMachine.force_transition_to(highCO2Night)
+    else:
+        pass
+
+def highCO2Day_logic():
+    # Referenced global variables
+    
+    if stateMachine.execute_once:
+        print("Machine in high CO2 day state")
+        # Create empty dictionary
+        sensorData = {}
+    
+    # Code that executes continously during state
+    sleep(10)
+    timeOfDay = evaluateDayOrNight()
+    topic = "OSVentilationPy/operatingMode/time"
+    mqttPublish(mqttClient, timeOfDay, topic, int(qos))
+    time.sleep_ms(100)
+    
+    # Publish state of state machine
+    state = "highCO2Day"
+    topic = "OSVentilationPy/operatingMode/state"
+    mqttPublish(mqttClient, state, topic, int(qos))
+    time.sleep_ms(100)
+    
+    #Read sensors, return array with readings
+    SCD41Reading = readSCD41(scd41)
+    DHT22Reading = readDHT22()
+
+    # Dictionary sensorData
+    sensorData = { "SCD41": { "Temperature": SCD41Reading[0], "RelativeHumidity": SCD41Reading[1], "CO2": SCD41Reading[2]}, "DHT22": {"Temperature": DHT22Reading[0], "RelativeHumidity": DHT22Reading[1]}}
+    
+    # Iterate through nested dictionary sensorData and publish to MQTT
+    for sensorType, measurement in sensorData.items():
+        print("\nSensor:", sensorType)
+        time.sleep_ms(200)
+    
+        for key in measurement:
+            #print(key + ':', measurement[key])
+            topic = "OSVentilationPy/" + sensorType + "/" + key 
+            mqttPublish(mqttClient, str(measurement[key]), topic, int(qos))
+            time.sleep_ms(200)
+
+    # Read valve position of requested valve from file and publish valve positions to MQTT
+    with open('valvePositions.json') as f:
+        valvePositions = json.loads(f.read())    
+    
+    for i in range(12):
+        topic = "OSVentilationPy/position/valve" + str(i)
+        valvePosition = valvePositions[("valve" + str(i))]
+        print("\nTopic is:", topic, "ValvePosition is:", valvePosition)
+        mqttPublish(mqttClient, str(valvePosition), topic, int(qos))
+        time.sleep_ms(200)
+    
+    f.close()
+    
+    # Conditions to make transition to other states
+    if timeOfDay == "day" and SCD41Reading[2] <700:
+        print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transistions to day")
+        stateMachine.force_transition_to(day)
+    elif timeOfDay == "night" and SCD41Reading[2] >900:
+        print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to highCO2Night")
+        stateMachine.force_transition_to(highCO2Night)
+    elif timeOfDay == "night" and SCD41Reading[2] <700:
+        print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to night")
+        stateMachine.force_transition_to(night)
+    else:
+        pass
+    
+    
+def highCO2Night_logic():
+    # Referenced global variables
+    
+    if stateMachine.execute_once:
+        print("Machine in high CO2 night state")
+        # Create empty dictionary
+        sensorData = {}
+        
+    # Code that executes continously during state    
+    sleep(10)
+    timeOfDay = evaluateDayOrNight()
+    topic = "OSVentilationPy/operatingMode/time"
+    mqttPublish(mqttClient, timeOfDay, topic, int(qos))
+    time.sleep_ms(100)
+    
+    # Publish state of state machine
+    state = "highCO2Night"
+    topic = "OSVentilationPy/operatingMode/state"
+    mqttPublish(mqttClient, state, topic, int(qos))
+    time.sleep_ms(100)
+    
+    #Read sensors, return array with readings
+    SCD41Reading = readSCD41(scd41)
+    DHT22Reading = readDHT22()
+
+    # Dictionary sensorData
+    sensorData = { "SCD41": { "Temperature": SCD41Reading[0], "RelativeHumidity": SCD41Reading[1], "CO2": SCD41Reading[2]}, "DHT22": {"Temperature": DHT22Reading[0], "RelativeHumidity": DHT22Reading[1]}}
+    
+    # Iterate through nested dictionary sensorData and publish to MQTT
+    for sensorType, measurement in sensorData.items():
+        print("\nSensor:", sensorType)
+        time.sleep_ms(200)
+    
+        for key in measurement:
+            #print(key + ':', measurement[key])
+            topic = "OSVentilationPy/" + sensorType + "/" + key 
+            mqttPublish(mqttClient, str(measurement[key]), topic, int(qos))
+            time.sleep_ms(200)
+
+    # Read valve position of requested valve from file and publish valve positions to MQTT
+    with open('valvePositions.json') as f:
+        valvePositions = json.loads(f.read())    
+    
+    for i in range(12):
+        topic = "OSVentilationPy/position/valve" + str(i)
+        valvePosition = valvePositions[("valve" + str(i))]
+        print("\nTopic is:", topic, "ValvePosition is:", valvePosition)
+        mqttPublish(mqttClient, str(valvePosition), topic, int(qos))
+        time.sleep_ms(200)
+    
+    f.close()    
+        
+    # Conditions to make transition to other states
+    if timeOfDay == "day" and SCD41Reading[2] <700:
+        print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to day state")
+        stateMachine.force_transition_to(day)
+    elif timeOfDay == "day" and SCD41Reading[2] >900:
+        print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to highCO2Day")
+        stateMachine.force_transition_to(highCO2Day)
+    elif timeOfDay == "night" and SCD41Reading[2] <700:
+        print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to highCO2Night")
+        stateMachine.force_transition_to(night)
+    else:
+        pass    
 
 # Add states to machine (Also create state objects)
 init = stateMachine.add_state(init_logic)
 day = stateMachine.add_state(day_logic)
 night = stateMachine.add_state(night_logic)
-
+higCO2Day = stateMachine.add_state(highCO2Day_logic)
+higCO2Night = stateMachine.add_state(highCO2Night_logic)
 
 # ===========================================================================================
 # Main program

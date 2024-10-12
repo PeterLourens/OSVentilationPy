@@ -33,7 +33,7 @@ def moveValve(requestedPosition, valveNumber):
     
     # Get current position from data from file
     currentPosition=int(data[valve])
-    print("\nCurrent position for",valve,"from file is",currentPosition)
+    print("Current position for",valve,"from file is",currentPosition)
     
     # Each valve can move from position 0 (fully closed) to 24 (fully open).
     # The requested position is the absolute value of the new position.
@@ -53,13 +53,13 @@ def moveValve(requestedPosition, valveNumber):
         # Means valve needs to close
         direction = "close"
         valvePositionMove = currentPosition - requestedPosition
-        print("\nValve will move", valvePositionMove, "positions", "in direction", direction)
+        print("Valve will move", valvePositionMove, "positions", "in direction", direction)
         newPosition = requestedPosition
     elif requestedPosition > currentPosition:
         # Means valve needs to open further
         direction = "open"
         valvePositionMove = requestedPosition - currentPosition
-        print("\nValve will move", valvePositionMove, "positions", "in direction", direction)
+        print("Valve will move", valvePositionMove, "positions", "in direction", direction)
         newPosition = requestedPosition
     else:
         # Current position is the same requestedPosition so nothing to do
@@ -140,11 +140,11 @@ def moveValve(requestedPosition, valveNumber):
         else:
             print("Incorrection direction given, use either 0 (open) or 1 (close)")
     else:
-        print("\nValve move is 0")
+        print("Valve move is 0")
 
     # Now write new position to of valve to json file. Data from the file before move is still available in variable data
     data[valve] = newPosition
-    print("\nNew valve positions:", data)
+    print("New valve positions:", data)
     
     # Write data to json file
     with open('valvePositions.json','w') as f:

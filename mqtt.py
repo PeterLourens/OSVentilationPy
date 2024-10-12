@@ -1,30 +1,49 @@
 from umqtt.simple import MQTTClient
+from time import sleep
 
+import time
 
-mqtt_server = '192.168.0.15'
-mqtt_user = ''
-mqtt_pass = ''
-topic = "OSVentilationPy"
+global mqttServer
+global mqqtUser
+global mqttPass
+global ClientID
+
+mqttServer = '192.168.0.15'
+mqttUser = ''
+mqttPass = ''
 ClientID = "OSVentilationPy"
 
 def mqttConnect():
-    print('\nConnected to MQTT Broker "%s"' % (mqtt_server))
-    client = MQTTClient(ClientID, mqtt_server, 1883, mqtt_user, mqtt_pass)
+    print('\nConnected to MQTT Broker "%s"' % (mqttServer))
+    client = MQTTClient(ClientID, mqttServer, 1883, mqttUser, mqttPass)
     client.connect()
     return client
 
 def mqttReconnect():
-    print('Failed to connect to MQTT broker, Reconnecting...' % (mqttt_server))
+    print('Failed to connect to MQTT broker, Reconnecting...')
     time.sleep(5)
     client.reconnect()
 
-def mqttPublish(topic):
-    try:
-        client = connect()
-    except OSError as e:
-        reconnect()
-        
-    while True:
-        print('send message %s on topic %s' % (msg, topic))
-        client.publish(topic, msg, qos=0)
-        time.sleep(1)
+def mqttPublish(client,msg,topic,qos):
+    #try:
+        #client = mqttConnect()
+        #client = mqttIsConnected()
+        #client.ping()
+        #client.ping()
+    #except OSError as e:
+        #print("\nLost connection to mqtt broker. Reconnecting....")
+        #mqttReconnect()
+    print('Send message %s on topic %s with QOS=%s' % (msg, topic, qos))
+    client.publish(topic, msg, qos)
+    time.sleep(1)
+
+#def mqttIsConnected():
+#    try:
+#        client.ping()
+#        client.ping()
+#    except:
+#        print("\nLost connection to mqtt broker.")
+#        return False
+#    else:
+#        return True
+
