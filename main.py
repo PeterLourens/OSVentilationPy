@@ -21,7 +21,6 @@ global mqttClient
 global stateTransitionMatrix
 global remoteState
 
-
 #=========================================================================
 # Constants
 #=========================================================================
@@ -30,30 +29,29 @@ CO2_MIN_LEVEL = 800
 MQTT_QOS = 0
 SUBSCRIBE_TOPIC = b"zigbee2mqtt/Reading light switch/action"
 
-
 #=========================================================================
 # MQTT Connection
 #=========================================================================
-
 try:
     mqttClient = mqttConnect()
 except OSError as e:
     mqttReconnect()
 
+# Call back function
 def sub_cb(topic, msg):
-    #print((topic, msg))
-    #print("Message received")
-    if msg.decode() == "on":
+    print((topic, msg))
+    if msg == b'on':
         remoteState = "on"
+    if msg == b'off':
+        remoteState = "off"      
     else:
-        remoteState = "off"
+        remoteState = "undefined"
     return remoteState
 
 # Subscribe to remote control status
 mqttClient.set_callback(sub_cb)
 mqttClient.subscribe(SUBSCRIBE_TOPIC)
 print("Subscribed to:", SUBSCRIBE_TOPIC)
-
 
 #=========================================================================
 # Real Time Clock & time sync with NTP server & UTC_OFFSET calculation
@@ -69,14 +67,12 @@ utcOffset = utcOffset()
 actual_time = time.localtime(time.time() + utcOffset)
 print("Actual time", actual_time)
 
-
 #=========================================================================
 # State Machine Matrix
 #=========================================================================
 print("\nOpening state transistionMatrix")
 with open('stateTransitionMatrix.json') as f:
     stateMachineMatrix = json.loads(f.read())
-
 
 #=========================================================================
 # System stats
@@ -97,7 +93,6 @@ def free(full=False):
 def setValves():
     pass
 
-
 #=========================================================================
 # Statemachine
 #=========================================================================
@@ -112,16 +107,16 @@ def init_logic():
         print("\nMachine in init state")
         
         # For this state valve positions have to change to default position. This is transition0
-        for i in range(12):
-            valve = "valve" + str(i) + "Position"
-            requestedPosition = stateMachineMatrix["transition0"][valve]
-            moveValve(requestedPosition, i)
-            clearOutputs()
+        #for i in range(12):
+        #    valve = "valve" + str(i) + "Position"
+        #    requestedPosition = stateMachineMatrix["transition0"][valve]
+        #    moveValve(requestedPosition, i)
+        #    clearOutputs()
             
             # Publish to mqtt server
-            topic = "OSVentilationPy/position/valve" + str(i)
-            mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
-            time.sleep_ms(200)
+        #    topic = "OSVentilationPy/position/valve" + str(i)
+        #    mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
+        #    time.sleep_ms(200)
         
         # Set fan speed to low
         print("Fan speed is low")
@@ -218,11 +213,10 @@ def day_logic():
     
     f.close()
     
+    # Check for status of remote control. The signal is maintained (so remains on when pressed 1 and off when 0)
     #while True:
-        # Non-blocking wait for message
-        #mqttClient.check_msg()
-        #print("Message received")
-        #print("remote message received, remoteSte is:", remoteState)
+    mqttClient.check_msg()
+    print("\nremoteState is:", remoteState)
     
     # Evaluate conditions to make transition to other states
     if timeOfDay == "night" and SCD41Reading[2] < CO2_MAX_LEVEL:
@@ -244,8 +238,18 @@ def night_logic():
         print("Machine in night state")
         sensorData = {}
         
-        # No need to change valve posaitions because they are already set at init correctly
-        
+        # For this state valve positions have to change to default position. This is transition0
+        for i in range(12):
+            valve = "valve" + str(i) + "Position"
+            requestedPosition = stateMachineMatrix["transition0"][valve]
+            moveValve(requestedPosition, i)
+            clearOutputs()
+            
+            # Publish to mqtt server
+            topic = "OSVentilationPy/position/valve" + str(i)
+            mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
+            time.sleep_ms(200)
+
         # Set fan speed low
         print("Fan speed is low")
 
