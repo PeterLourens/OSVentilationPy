@@ -219,13 +219,13 @@ def day_logic():
     print("\nremoteState is:", remoteState)
     
     # Evaluate conditions to make transition to other states
-    if timeOfDay == "night" and SCD41Reading[2] < CO2_MAX_LEVEL:
+    if timeOfDay == "night" and SCD41Reading[2] < int(CO2_MAX_LEVEL):
         print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to night")
         stateMachine.force_transition_to(night)
-    elif timeOfDay == "day" and SCD41Reading[2] > CO2_MAX_LEVEL:
+    elif timeOfDay == "day" and SCD41Reading[2] > int(CO2_MAX_LEVEL):
         print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to highCO2Day")
         stateMachine.force_transition_to(highCO2Day)
-    elif timeOfDay == "night" and SCD41Reading[2] > CO2_MAX_LEVEL:
+    elif timeOfDay == "night" and SCD41Reading[2] > int(CO2_MAX_LEVEL):
         print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to highCO2Night")
         stateMachine.force_transition_to(highCO2Night)
     else:
@@ -300,13 +300,13 @@ def night_logic():
     f.close()
 
     # Evaluate conditions to make transition to other states
-    if timeOfDay == "day" and SCD41Reading[2] < CO2_MIN_LEVEL:
+    if timeOfDay == "day" and SCD41Reading[2] < int(CO2_MIN_LEVEL):
         print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to day")
         stateMachine.force_transition_to(day)
-    elif timeOfDay == "day" and SCD41Reading[2] > CO2_MAX_LEVEL:
+    elif timeOfDay == "day" and SCD41Reading[2] > int(CO2_MAX_LEVEL):
         print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to highCO2day state")
         stateMachine.force_transition_to(highCO2Day)
-    elif timeOfDay == "night" and SCD41Reading[2] > CO2_MAX_LEVEL:
+    elif timeOfDay == "night" and SCD41Reading[2] > int(CO2_MAX_LEVEL):
         print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to highCO2night state")
         stateMachine.force_transition_to(highCO2Night)
     else:
@@ -320,7 +320,17 @@ def highCO2Day_logic():
         # Create empty dictionary
         sensorData = {}
         
-        # No need to change valve positions because they are set already correctly at init state
+        # For this state valve positions have to change to default position. This is transition0
+        for i in range(12):
+            valve = "valve" + str(i) + "Position"
+            requestedPosition = stateMachineMatrix["transition0"][valve]
+            moveValve(requestedPosition, i)
+            clearOutputs()
+            
+            # Publish to mqtt server
+            topic = "OSVentilationPy/position/valve" + str(i)
+            mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
+            time.sleep_ms(200)
         
         # Set fan speed to high
         print("Fan speed is high")
@@ -372,13 +382,13 @@ def highCO2Day_logic():
     f.close()
     
     # Evaluate conditions to make transition to other states
-    if timeOfDay == "day" and SCD41Reading[2] < CO2_MIN_LEVEL:
+    if timeOfDay == "day" and SCD41Reading[2] < int(CO2_MIN_LEVEL):
         print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transistions to day")
         stateMachine.force_transition_to(day)
-    elif timeOfDay == "night" and SCD41Reading[2] > CO2_MAX_LEVEL:
+    elif timeOfDay == "night" and SCD41Reading[2] > int(CO2_MAX_LEVEL):
         print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to highCO2Night")
         stateMachine.force_transition_to(highCO2Night)
-    elif timeOfDay == "night" and SCD41Reading[2] < CO2_MIN_LEVEL:
+    elif timeOfDay == "night" and SCD41Reading[2] < int(CO2_MIN_LEVEL):
         print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to night")
         stateMachine.force_transition_to(night)
     else:
@@ -455,13 +465,13 @@ def highCO2Night_logic():
     f.close()
         
     # Evaluate conditions to make transition to other states
-    if timeOfDay == "day" and SCD41Reading[2] < CO2_MIN_LEVEL:
+    if timeOfDay == "day" and SCD41Reading[2] < int(CO2_MIN_LEVEL):
         print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to day state")
         stateMachine.force_transition_to(day)
-    elif timeOfDay == "day" and SCD41Reading[2] > CO2_MAX_LEVEL:
+    elif timeOfDay == "day" and SCD41Reading[2] > int(CO2_MAX_LEVEL):
         print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to highCO2Day")
         stateMachine.force_transition_to(highCO2Day)
-    elif timeOfDay == "night" and SCD41Reading[2] < CO2_MIN_LEVEL:
+    elif timeOfDay == "night" and SCD41Reading[2] < int(CO2_MIN_LEVEL):
         print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to highCO2Night")
         stateMachine.force_transition_to(night)
     else:
@@ -543,16 +553,16 @@ def manualHighSpeed_logic():
     f.close()
         
     # Evaluate conditions to make transition to other states
-    if timeOfDay == "day" and SCD41Reading[2] > CO2_MAX_LEVEL:
+    if timeOfDay == "day" and SCD41Reading[2] > int(CO2_MAX_LEVEL):
         print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to highCO2Day state")
         stateMachine.force_transition_to(highCO2Day)
-    elif timeOfDay == "night" and SCD41Reading[2] > CO2_MAX_LEVEL:
+    elif timeOfDay == "night" and SCD41Reading[2] > int(CO2_MAX_LEVEL):
         print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to highCO2Night state")
         stateMachine.force_transition_to(highCO2Night)
-    elif timeOfDay == "night" and SCD41Reading[2] < CO2_MIN_LEVEL:
+    elif timeOfDay == "night" and SCD41Reading[2] < int(CO2_MIN_LEVEL):
         print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to night state")
         stateMachine.force_transition_to(night)    
-    elif remoteState == "off" and SCD41Reading[2] < CO2_MIN_LEVEL:
+    elif remoteState == "off" and SCD41Reading[2] < int(CO2_MIN_LEVEL):
         print("\nTime of day is:",timeOfDay, "CO2 is:",SCD41Reading[2], ", StateMachine transitions to night state")
         stateMachine.force_transition_to(day)
     else:
