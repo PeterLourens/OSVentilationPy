@@ -101,6 +101,7 @@ stateMachine = StateMachine()
 # States Logic Functions
 def init_logic():
     # Referenced global variables
+    global remoteState
     
     if stateMachine.execute_once:
         # 
@@ -125,6 +126,11 @@ def init_logic():
     topic = "OSVentilationPy/operatingMode/state"
     mqttPublish(mqttClient, state, topic, int(MQTT_QOS))
     
+    # Publish fan speed
+    fanSpeed = "low"
+    topic = "OSVentilationPy/operatingMode/fanSpeed"
+    mqttPublish(mqttClient, fanSpeed, topic, int(MQTT_QOS))
+    
     # StateMachine can only transition to either "day" or "night" states
     if timeOfDay == "day":
         print("\nTime of day is:",timeOfDay, ", StateMachine transitions to day")
@@ -136,6 +142,7 @@ def init_logic():
 
 def day_logic():
     # Referenced global variables
+    global remoteState
     
     if stateMachine.execute_once:
         print("Machine in day state")
@@ -172,6 +179,11 @@ def day_logic():
     mqttPublish(mqttClient, state, topic, int(MQTT_QOS))
     time.sleep_ms(100)
     
+    # Publish fan speed
+    fanSpeed = "medium"
+    topic = "OSVentilationPy/operatingMode/fanSpeed"
+    mqttPublish(mqttClient, fanSpeed, topic, int(MQTT_QOS))
+    
     #Read sensors, functions return array with readings
     SCD41Reading = readSCD41(scd41)
     DHT22Reading = readDHT22()
@@ -204,7 +216,6 @@ def day_logic():
     f.close()
     
     # Check for status of remote control. The signal is maintained (so remains on when pressed 1 and off when 0)
-    #while True:
     mqttClient.check_msg()
     print("\nremoteState is:", remoteState)
     
@@ -223,6 +234,7 @@ def day_logic():
 
 def night_logic():
     # Referenced global variables
+    global remoteState
     
     if stateMachine.execute_once:
         print("Machine in night state")
@@ -242,6 +254,11 @@ def night_logic():
 
         # Set fan speed low
         print("Fan speed is low")
+        
+        # Set remote to off otherwise it remains on and will axctivate high speed after transition
+        remoteState = "off"
+        mqttPublish(mqttClient, remoteState , SUBSCRIBE_TOPIC, int(MQTT_QOS))
+        time.sleep_ms(200)
 
     # Code that executes continously during state
     
@@ -257,6 +274,11 @@ def night_logic():
     topic = "OSVentilationPy/operatingMode/state"
     mqttPublish(mqttClient, state, topic, int(MQTT_QOS))
     time.sleep_ms(100)
+    
+    # Publish fan speed
+    fanSpeed = "low"
+    topic = "OSVentilationPy/operatingMode/fanSpeed"
+    mqttPublish(mqttClient, fanSpeed, topic, int(MQTT_QOS))
     
     #Read sensors, return array with readings
     SCD41Reading = readSCD41(scd41)
@@ -304,6 +326,7 @@ def night_logic():
 
 def highCO2Day_logic():
     # Referenced global variables
+    global remoteState
     
     if stateMachine.execute_once:
         print("Machine in high CO2 day state")
@@ -324,6 +347,11 @@ def highCO2Day_logic():
         
         # Set fan speed to high
         print("Fan speed is high")
+        
+        # Set remote to off otherwise it remains on and will axctivate high speed after transition
+        remoteState = "off"
+        mqttPublish(mqttClient, remoteState , SUBSCRIBE_TOPIC, int(MQTT_QOS))
+        time.sleep_ms(200)
     
     # Code that executes continously during state
     
@@ -339,6 +367,11 @@ def highCO2Day_logic():
     topic = "OSVentilationPy/operatingMode/state"
     mqttPublish(mqttClient, state, topic, int(MQTT_QOS))
     time.sleep_ms(100)
+    
+    # Publish fan speed
+    fanSpeed = "high"
+    topic = "OSVentilationPy/operatingMode/fanSpeed"
+    mqttPublish(mqttClient, fanSpeed, topic, int(MQTT_QOS))
     
     #Read sensors, return array with readings
     SCD41Reading = readSCD41(scd41)
@@ -387,6 +420,7 @@ def highCO2Day_logic():
     
 def highCO2Night_logic():
     # Referenced global variables
+    global remoteState
     
     if stateMachine.execute_once:
         print("Machine in high CO2 night state")
@@ -408,6 +442,11 @@ def highCO2Night_logic():
         # Set fan speed to low
         print("Fan speed is low")
         
+        # Set remote to off otherwise it remains on and will axctivate high speed after transition
+        remoteState = "off"
+        mqttPublish(mqttClient, remoteState , SUBSCRIBE_TOPIC, int(MQTT_QOS))
+        time.sleep_ms(100)
+        
     # Code that executes continously during state
     
     # Evaluate time and sensor data and publish to MQTT
@@ -422,6 +461,11 @@ def highCO2Night_logic():
     topic = "OSVentilationPy/operatingMode/state"
     mqttPublish(mqttClient, state, topic, int(MQTT_QOS))
     time.sleep_ms(100)
+    
+    # Publish fan speed
+    fanSpeed = "low"
+    topic = "OSVentilationPy/operatingMode/fanSpeed"
+    mqttPublish(mqttClient, fanSpeed, topic, int(MQTT_QOS))
     
     #Read sensors, return array with readings
     SCD41Reading = readSCD41(scd41)
@@ -487,13 +531,8 @@ def manualHighSpeed_logic():
             mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
             time.sleep_ms(200)
         
-        # Set fan speed to low
+        # Set fan speed to high
         print("Fan speed is high")
-        
-        # Set remote to off
-        remoteState = "off"
-        mqttPublish(mqttClient, remoteState , SUBSCRIBE_TOPIC, int(MQTT_QOS))
-        time.sleep_ms(200)
         
     # Code that executes continously during state
     
@@ -510,6 +549,11 @@ def manualHighSpeed_logic():
     topic = "OSVentilationPy/operatingMode/state"
     mqttPublish(mqttClient, state, topic, int(MQTT_QOS))
     time.sleep_ms(100)
+    
+    # Publish fan speed
+    fanSpeed = "high"
+    topic = "OSVentilationPy/operatingMode/fanSpeed"
+    mqttPublish(mqttClient, fanSpeed, topic, int(MQTT_QOS))
     
     #Read sensors, return array with readings
     SCD41Reading = readSCD41(scd41)
