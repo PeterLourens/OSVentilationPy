@@ -1,4 +1,5 @@
-from umqtt.simple import MQTTClient
+#from umqtt.simple import MQTTClient
+from robust import *
 from time import sleep
 
 import time
@@ -37,6 +38,9 @@ def mqttPublish(client,msg,topic,qos):
     client.publish(topic, msg, qos)
     time.sleep(1)
 
+
+
+
 #def mqttIsConnected():
 #    try:
 #        client.ping()
@@ -46,4 +50,5 @@ def mqttPublish(client,msg,topic,qos):
 #        return False
 #    else:
 #        return True
+
 
