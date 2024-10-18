@@ -5,6 +5,7 @@ from scd41 import SCD4X
 from sensors import *
 from mqtt import *
 from timefunctions import *
+#from robust import *
 
 import time
 import gc
@@ -37,7 +38,7 @@ try:
 except OSError as e:
     mqttReconnect()
 
-remoteState=""
+remoteState="off"
 
 # Call back function
 def sub_cb(topic, msg):
