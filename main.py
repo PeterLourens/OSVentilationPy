@@ -750,7 +750,8 @@ def highRHDay_logic():
 
 def highRHNight_logic():
     # Referenced global variables
-    
+    global highRHDayTimerStart
+
     if stateMachine.execute_once:
         print("Machine in high RH night state")
         # Create empty dictionary
