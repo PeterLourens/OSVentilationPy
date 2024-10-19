@@ -633,10 +633,10 @@ def manualHighSpeed_logic():
     elif timeOfDay == "day" and SCD41Reading[2] > int(CO2_MAX_LEVEL) and remoteState == "off":
         print("\nStateMachine transitions to highCO2Day")
         stateMachine.force_transition_to(highCO2Day)
-    elif timeOfDay == "day" and SCD41Reading[2] < int(CO2_MIN_LEVEL) and DHT22Reading[1] < int(MAX_RH_LEVEL) and remoteState == "off":
+    elif timeOfDay == "day" and SCD41Reading[2] < int(CO2_MIN_LEVEL) and DHT22Reading[1] < int(RH_MAX_LEVEL) and remoteState == "off":
         print("\nStateMachine transitions to day")
         stateMachine.force_transition_to(day)
-    elif timeOfDay == "day" and SCD41Reading[2] < int(CO2_MIN_LEVEL) and DHT22Reading[1] > int(MAX_RH_LEVEL) and remoteState == "off":
+    elif timeOfDay == "day" and SCD41Reading[2] < int(CO2_MIN_LEVEL) and DHT22Reading[1] > int(RH_MAX_LEVEL) and remoteState == "off":
         print("\nStateMachine transitions to highRHDay")
         stateMachine.force_transition_to(highRHDay)
     else:
