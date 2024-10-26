@@ -113,6 +113,10 @@ def setValves():
 #=========================================================================
 stateMachine = StateMachine()
 
+#def state_machine_logic():  
+#    while True:
+#        stateMachine.run()
+
 # States Logic Functions
 def init_logic():
     # Referenced global variables
@@ -427,7 +431,7 @@ def highCO2Day_logic():
     if timeOfDay == "night":
         print("\nStateMachine transitions to highCO2Night")
         stateMachine.force_transition_to(highCO2Night)
-    elif timeOfDay == "day" and remoteState == "off":
+    elif timeOfDay == "day" and SCD41Reading[2] < int(CO2_MIN_LEVEL) and remoteState == "off":
         print("\nStateMachine transitions to day")
         stateMachine.force_transition_to(day)
     elif timeOfDay == "day" and remoteState == "on":
@@ -435,7 +439,6 @@ def highCO2Day_logic():
         stateMachine.force_transition_to(manualHighSpeed)       
     else:
         pass
-    
     
 def highCO2Night_logic():
     # Referenced global variables
@@ -521,11 +524,14 @@ def highCO2Night_logic():
 
     # Evaluate conditions to make transition to other states
     if timeOfDay == "night" and SCD41Reading[2] < int(CO2_MIN_LEVEL):
-        print("\nStateMachine transitions to day")
+        print("\nStateMachine transitions to night")
         stateMachine.force_transition_to(night)
-    elif timeOfDay == "day":
+    elif timeOfDay == "day" and SCD41Reading[2] < int(CO2_MIN_LEVEL):
+        print("\nStateMachine transitions to Day")
+        stateMachine.force_transition_to(day)
+    elif timeOfDay == "day" and SCD41Reading[2] > int(CO2_MAX_LEVEL):
         print("\nStateMachine transitions to highCO2Day")
-        stateMachine.force_transition_to(highCO2day)
+        stateMachine.force_transition_to(highCO2Day)
     else:
         pass
 
@@ -899,6 +905,10 @@ print("Today is",dayOfWeekToDay(dateTime[6]))
 # Main Loop:
 while True:
     stateMachine.run()
+
+#_thread.start_new_thread(state_machine_logic, ())
+
+#state_machine_logic()
 
 
 
