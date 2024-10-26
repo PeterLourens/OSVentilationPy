@@ -4,6 +4,8 @@ from sr74hc595_bitbang import SR74HC595_BITBANG
 from machine import Pin, SoftI2C
 from valveControl import clearOutputs
 
+import secrets
+
 clearOutputs()
 print("clearing outputs")
 
@@ -27,7 +29,8 @@ def do_connect(ssid, pwd):
 #esp.osdebug(None)
  
 # Attempt to connect to WiFi network
-do_connect('DIRK3', '095679706460482465742852')
+do_connect(secrets.SSID, secrets.WIFI_PASS)
 
 import webrepl
 webrepl.start()
+
