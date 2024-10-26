@@ -5,7 +5,6 @@ from scd41 import SCD4X
 from sensors import *
 from mqtt import *
 from timefunctions import *
-#from robust import *
 
 import time
 import gc
@@ -249,6 +248,12 @@ def day_logic():
     elif timeOfDay == "day" and remoteState == "on":
         print("\nStateMachine transitions to manualHighSpeed")
         stateMachine.force_transition_to(manualHighSpeed)
+    elif timeOfDay == "day" and valveCycleTimesDay() == True:
+        print("\nStateMachine transitions to valveCycleDay")
+        stateMachine.force_transition_to(valveCycleDay)
+    elif timeOfDay == "day" and cookingTimes() == True:
+        print("\nStateMachine transitions to valveCycleDay")
+        stateMachine.force_transition_to(cooking)
     else:
         pass
 
@@ -856,6 +861,297 @@ def highRHNight_logic():
     else:
         pass
 
+def valveCycleDay_logic():
+    # Referenced global variables
+
+    if stateMachine.execute_once:
+        print("Machine in valve cycle day state")
+        # Create empty dictionary
+        sensorData = {}
+        
+        # For this state valve positions have to change to valve cycle day. This is transition25
+        for i in range(12):
+            valve = "valve" + str(i) + "Position"
+            requestedPosition = stateMachineMatrix["transition25"][valve]
+            moveValve(requestedPosition, i)
+            clearOutputs()
+            
+            # Publish to mqtt server
+            topic = "OSVentilationPy/position/valve" + str(i)
+            mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
+            time.sleep_ms(MQTT_SLEEP)
+        
+        # Set fan speed to low
+        print("Fan speed is medium")
+               
+    # Code that executes continously during state
+    sleep(TRANSITION_DELAY)
+    
+    # Set remote to off to sure remote start with off when transition to day or highCO2Day state. State of remote control is not a condition in valve cycle day
+    remote = "off"
+    mqttPublish(mqttClient, remote, REMOTE_PUB_TOPIC, int(MQTT_QOS))
+    time.sleep_ms(MQTT_SLEEP)
+    
+    # Publish time to MQTT
+    timeOfDay = evaluateDayOrNight()
+    mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
+    time.sleep_ms(MQTT_SLEEP)
+    
+    # Publish state of state machine
+    state = "manualHighSpeed"
+    mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
+    time.sleep_ms(MQTT_SLEEP)
+    
+    # Publish fan speed
+    fanSpeed = "high"
+    mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
+    time.sleep_ms(MQTT_SLEEP)
+    
+    #Read sensors, return array with readings
+    SCD41Reading = readSCD41(scd41)
+    DHT22Reading = readDHT22()
+
+    # Dictionary sensorData
+    sensorData = { "SCD41": { "Temperature": SCD41Reading[0], "RelativeHumidity": SCD41Reading[1], "CO2": SCD41Reading[2]}, "DHT22": {"Temperature": DHT22Reading[0], "RelativeHumidity": DHT22Reading[1]}}
+    
+    # Iterate through nested dictionary sensorData and publish to MQTT
+    for sensorType, measurement in sensorData.items():
+        print("\nSensor:", sensorType)
+        time.sleep_ms(MQTT_SLEEP)
+    
+        for key in measurement:
+            #print(key + ':', measurement[key])
+            topic = "OSVentilationPy/" + sensorType + "/" + key 
+            mqttPublish(mqttClient, str(measurement[key]), topic, int(MQTT_QOS))
+            time.sleep_ms(MQTT_SLEEP)
+
+    # Read valve position of requested valve from file and publish valve positions to MQTT
+    with open('valvePositions.json') as f:
+        valvePositions = json.loads(f.read()) 
+    
+    for i in range(12):
+        topic = "OSVentilationPy/position/valve" + str(i)
+        valvePosition = valvePositions[("valve" + str(i))]
+        print("\nTopic is:", topic, "ValvePosition is:", valvePosition)
+        mqttPublish(mqttClient, str(valvePosition), topic, int(MQTT_QOS))
+        time.sleep_ms(MQTT_SLEEP)
+    
+    f.close() 
+   
+    # No need to check remote control as manual high speed is not availble in the valvec cycle day
+    
+    # Print conditions
+    print("\nTime of day is:",timeOfDay, ", CO2 is:",SCD41Reading[2], ", RH bathroom is:",DHT22Reading[1], ", remote state is:",remoteState)
+         
+    # Evaluate conditions to make transition to other states
+    if timeOfDay == "day" and SCD41Reading[2] > int(CO2_MAX_LEVEL):
+        print("\nStateMachine transitions to highCO2Day")
+        stateMachine.force_transition_to(highCO2Day)
+    elif timeOfDay == "day" and DHT22Reading[1] > int(RH_MAX_LEVEL):
+        print("\nStateMachine transitions to highRHDay")
+        stateMachine.force_transition_to(highRHDay)
+    elif timeOfDay == "day" and remoteState == "on":
+        print("\nStateMachine transitions to manualHighSpeed")
+        stateMachine.force_transition_to(manualHighSpeed)
+    elif timeOfDay == "day" and valveCycleTimesDay() == False:
+        print("\nStateMachine transitions to day")
+        stateMachine.force_transition_to(day)
+    else:
+        pass
+
+def valveCycleNight_logic():
+    # Referenced global variables
+
+    if stateMachine.execute_once:
+        print("Machine in valve cycle day state")
+        # Create empty dictionary
+        sensorData = {}
+        
+        # For this state valve positions have to change to valve cycle day. This is transition22
+        for i in range(12):
+            valve = "valve" + str(i) + "Position"
+            requestedPosition = stateMachineMatrix["transition22"][valve]
+            moveValve(requestedPosition, i)
+            clearOutputs()
+            
+            # Publish to mqtt server
+            topic = "OSVentilationPy/position/valve" + str(i)
+            mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
+            time.sleep_ms(MQTT_SLEEP)
+        
+        # Set fan speed to low
+        print("Fan speed is low")
+               
+    # Code that executes continously during state
+    sleep(TRANSITION_DELAY)
+    
+    # Set remote to off to sure remote start with off when transition to day or highCO2Day state. State of remote control is not a condition in valve cycle day
+    remote = "off"
+    mqttPublish(mqttClient, remote, REMOTE_PUB_TOPIC, int(MQTT_QOS))
+    time.sleep_ms(MQTT_SLEEP)
+    
+    # Publish time to MQTT
+    timeOfDay = evaluateDayOrNight()
+    mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
+    time.sleep_ms(MQTT_SLEEP)
+    
+    # Publish state of state machine
+    state = "manualHighSpeed"
+    mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
+    time.sleep_ms(MQTT_SLEEP)
+    
+    # Publish fan speed
+    fanSpeed = "high"
+    mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
+    time.sleep_ms(MQTT_SLEEP)
+    
+    #Read sensors, return array with readings
+    SCD41Reading = readSCD41(scd41)
+    DHT22Reading = readDHT22()
+
+    # Dictionary sensorData
+    sensorData = { "SCD41": { "Temperature": SCD41Reading[0], "RelativeHumidity": SCD41Reading[1], "CO2": SCD41Reading[2]}, "DHT22": {"Temperature": DHT22Reading[0], "RelativeHumidity": DHT22Reading[1]}}
+    
+    # Iterate through nested dictionary sensorData and publish to MQTT
+    for sensorType, measurement in sensorData.items():
+        print("\nSensor:", sensorType)
+        time.sleep_ms(MQTT_SLEEP)
+    
+        for key in measurement:
+            #print(key + ':', measurement[key])
+            topic = "OSVentilationPy/" + sensorType + "/" + key 
+            mqttPublish(mqttClient, str(measurement[key]), topic, int(MQTT_QOS))
+            time.sleep_ms(MQTT_SLEEP)
+
+    # Read valve position of requested valve from file and publish valve positions to MQTT
+    with open('valvePositions.json') as f:
+        valvePositions = json.loads(f.read()) 
+    
+    for i in range(12):
+        topic = "OSVentilationPy/position/valve" + str(i)
+        valvePosition = valvePositions[("valve" + str(i))]
+        print("\nTopic is:", topic, "ValvePosition is:", valvePosition)
+        mqttPublish(mqttClient, str(valvePosition), topic, int(MQTT_QOS))
+        time.sleep_ms(MQTT_SLEEP)
+    
+    f.close() 
+   
+    # No need to check remote control as manual high speed is not availble in the valvec cycle day
+    
+    # Print conditions
+    print("\nTime of day is:",timeOfDay, ", CO2 is:",SCD41Reading[2], ", RH bathroom is:",DHT22Reading[1], ", remote state is:",remoteState)
+         
+    # Evaluate conditions to make transition to other states
+    if timeOfDay == "night" and SCD41Reading[2] > int(CO2_MAX_LEVEL):
+        print("\nStateMachine transitions to highCO2Day")
+        stateMachine.force_transition_to(highCO2Night)
+    elif timeOfDay == "night" and DHT22Reading[1] > int(RH_MAX_LEVEL):
+        print("\nStateMachine transitions to highRHNight")
+        stateMachine.force_transition_to(highRHNight)
+    elif timeOfDay == "night" and valveCycleTimesNight() == False:
+        print("\nStateMachine transitions to night")
+        stateMachine.force_transition_to(night)
+    else:
+        pass
+
+def cooking_logic():
+    # Referenced global variables
+
+    if stateMachine.execute_once:
+        print("Machine in cooking state")
+        # Create empty dictionary
+        sensorData = {}
+        
+        # For this state valve positions have to change to valve cycle day. This is transition18
+        for i in range(12):
+            valve = "valve" + str(i) + "Position"
+            requestedPosition = stateMachineMatrix["transition18"][valve]
+            moveValve(requestedPosition, i)
+            clearOutputs()
+            
+            # Publish to mqtt server
+            topic = "OSVentilationPy/position/valve" + str(i)
+            mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
+            time.sleep_ms(MQTT_SLEEP)
+        
+        # Set fan speed to low
+        print("Fan speed is high")
+               
+    # Code that executes continously during state
+    sleep(TRANSITION_DELAY)
+    
+    # Set remote to off to sure remote start with off when transition to day or highCO2Day state. State of remote control is not a condition in valve cycle day
+    remote = "off"
+    mqttPublish(mqttClient, remote, REMOTE_PUB_TOPIC, int(MQTT_QOS))
+    time.sleep_ms(MQTT_SLEEP)
+    
+    # Publish time to MQTT
+    timeOfDay = evaluateDayOrNight()
+    mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
+    time.sleep_ms(MQTT_SLEEP)
+    
+    # Publish state of state machine
+    state = "manualHighSpeed"
+    mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
+    time.sleep_ms(MQTT_SLEEP)
+    
+    # Publish fan speed
+    fanSpeed = "high"
+    mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
+    time.sleep_ms(MQTT_SLEEP)
+    
+    #Read sensors, return array with readings
+    SCD41Reading = readSCD41(scd41)
+    DHT22Reading = readDHT22()
+
+    # Dictionary sensorData
+    sensorData = { "SCD41": { "Temperature": SCD41Reading[0], "RelativeHumidity": SCD41Reading[1], "CO2": SCD41Reading[2]}, "DHT22": {"Temperature": DHT22Reading[0], "RelativeHumidity": DHT22Reading[1]}}
+    
+    # Iterate through nested dictionary sensorData and publish to MQTT
+    for sensorType, measurement in sensorData.items():
+        print("\nSensor:", sensorType)
+        time.sleep_ms(MQTT_SLEEP)
+    
+        for key in measurement:
+            #print(key + ':', measurement[key])
+            topic = "OSVentilationPy/" + sensorType + "/" + key 
+            mqttPublish(mqttClient, str(measurement[key]), topic, int(MQTT_QOS))
+            time.sleep_ms(MQTT_SLEEP)
+
+    # Read valve position of requested valve from file and publish valve positions to MQTT
+    with open('valvePositions.json') as f:
+        valvePositions = json.loads(f.read()) 
+    
+    for i in range(12):
+        topic = "OSVentilationPy/position/valve" + str(i)
+        valvePosition = valvePositions[("valve" + str(i))]
+        print("\nTopic is:", topic, "ValvePosition is:", valvePosition)
+        mqttPublish(mqttClient, str(valvePosition), topic, int(MQTT_QOS))
+        time.sleep_ms(MQTT_SLEEP)
+    
+    f.close() 
+   
+    # No need to check remote control as manual high speed is not availble in the valvec cycle day
+    
+    # Print conditions
+    print("\nTime of day is:",timeOfDay, ", CO2 is:",SCD41Reading[2], ", RH bathroom is:",DHT22Reading[1], ", remote state is:",remoteState)
+         
+    # Evaluate conditions to make transition to other states
+    if timeOfDay == "day" and SCD41Reading[2] > int(CO2_MAX_LEVEL):
+        print("\nStateMachine transitions to highCO2Day")
+        stateMachine.force_transition_to(highCO2Day)
+    elif timeOfDay == "day" and DHT22Reading[1] > int(RH_MAX_LEVEL):
+        print("\nStateMachine transitions to highRHDay")
+        stateMachine.force_transition_to(highRHDay)
+    elif timeOfDay == "day" and remoteState == "on":
+        print("\nStateMachine transitions to manualHighSpeed")
+        stateMachine.force_transition_to(manualHighSpeed)
+    elif timeOfDay == "day" and cookingTimes() == False:
+        print("\nStateMachine transitions to day")
+        stateMachine.force_transition_to(day)
+    else:
+        pass
+
 # Add states to machine (Also create state objects)
 init = stateMachine.add_state(init_logic)
 day = stateMachine.add_state(day_logic)
@@ -865,6 +1161,9 @@ highCO2Night = stateMachine.add_state(highCO2Night_logic)
 highRHDay = stateMachine.add_state(highRHDay_logic)
 highRHNight = stateMachine.add_state(highRHNight_logic)
 manualHighSpeed = stateMachine.add_state(manualHighSpeed_logic)
+valveCycleDay = stateMachine.add_state(valveCycleDay_logic)
+valveCycleNight = stateMachine.add_state(valveCycleNight_logic)
+cooking = stateMachine.add_state(cooking_logic)
 
 # ===========================================================================================
 # Main program
