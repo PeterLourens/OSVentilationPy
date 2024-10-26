@@ -21,12 +21,12 @@ def utcOffset():
     
     if (dateTime[0] % 400 == 0) or (dateTime[0] % 4 == 0) or (dateTime[0] % 100 != 0):
         # Leap year
-        print("Leap year")
+        print("\nLeap year")
         dstStartDate = 91
         dstEndDate = 301
     else:
         # Non Leap year
-        print("No leap year")
+        print("\nNo leap year")
         dstStartDate = 90
         dstEndDate = 300    
 
@@ -43,7 +43,7 @@ def utcOffset():
 
 def dayOfWeekToDay(dayOfWeek):
     # Array with names of the day. 1 is Monday, 6 is Sunday
-    weekDays = ["Monday","Tuesday","Wednesday","Thursday","Friday","Staturday","Sunday"]
+    weekDays = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
     return weekDays[int(dayOfWeek)]
 
 def evaluateDayOrNight():
@@ -53,19 +53,123 @@ def evaluateDayOrNight():
     dateTime = time.localtime(time.time() + utcOffset())
     
     # Get day of the week
-    dayOfWeek = dayOfWeekToDay(dateTime[6])
+    #dayOfWeek = dayOfWeekToDay(dateTime[6])
     
     # Logic to decide it is day or night time
-    if (dayOfWeek != "Saturday" or dayOfWeek != "Sunday") and dateTime[3] >= 7 and dateTime[3] < 21:
+    if dateTime[6] <= 4 and dateTime[3] >= 7 and dateTime[3] < 21: #Weekdays
         timeOfDay = "day"
-        print("\ndateTime:",dateTime)
-    elif (dayOfWeek == "Saturday" or dayOfWeek == "Sunday") and dateTime[3] >= 8 and dateTime[3] < 21:
+        print("\ndateTime:",dateTime, ", Weekday and daytime")
+    elif dateTime[6] > 4 and dateTime[3] >= 8 and dateTime[3] < 21: #Weekend
         timeOfDay = "day"
-        print("\ndateTime:",dateTime)
+        print("\ndateTime:",dateTime, ", Weekend and daytime")
     else:
         timeOfDay = "night"
-        print("\ndateTime:",dateTime)
+        print("\ndateTime:",dateTime, ", Night time")
     return timeOfDay
+
+def valveCycleTimesDay():
+    
+    # Updat dateTime
+    dateTime = time.localtime(time.time() + utcOffset())
+
+    # Return True if valve cycle should start, otherwise return False
+    if dateTime[3] == 10 and dateTime[4] < 30:
+        print("valveCycleDay modus active")
+        return True
+    elif dateTime[3] == 10 and dateTime[4] >= 30:
+        print("valveCycleDay modus not active")
+        return False
+    elif dateTime[3] == 12 and dateTime[4] < 30:
+        print("valveCycleDay modus active")
+        return True
+    elif dateTime[3] == 12 and dateTime[4] >= 30:
+        print("valveCycleDay modus not active")
+        return False
+    elif dateTime[3] == 14 and dateTime[4] < 30:
+        print("valveCycleDay modus active")
+        return True
+    elif dateTime[3] == 14 and dateTime[4] >= 30:
+        print("valveCycleDay modus not active")
+        return False
+    elif dateTime[3] == 16 and dateTime[4] < 30:
+        print("valveCycleDay modus active")
+        return True
+    elif dateTime[3] == 16 and dateTime[4] >= 30:
+        print("valveCycleDay modus not active")
+        return False
+    elif dateTime[3] == 18 and dateTime[4] < 30:
+        print("valveCycleDay modus active")
+        return True
+    elif dateTime[3] == 18 and dateTime[4] >= 30:
+        print("valveCycleDay modus not active")
+        return False
+    if dateTime[3] == 20 and dateTime[4] < 30:
+        print("valveCycleDay modus active")
+        return True
+    if dateTime[3] == 20 and dateTime[4] >= 30:
+        print("valveCycleDay modus not active")
+        return False
+    else:
+        print("valveCycleDay modus not active")
+        return False
+
+def valveCycleTimesNight():
+    
+    # Updat dateTime
+    dateTime = time.localtime(time.time() + utcOffset())
+
+    # Return True if valve cycle should start, otherwise return False
+    if dateTime[3] == 23 and dateTime[4] < 30:
+        print("valveCycleNight modus active")
+        return True
+    elif dateTime[3] == 23 and dateTime[4] >= 30:
+        print("valveCycleNight modus not active")
+        return False
+    elif dateTime[3] == 1 and dateTime[4] < 30:
+        print("valveCycleNight modus active")
+        return True
+    elif dateTime[3] == 1 and dateTime[4] >= 30:
+        print("valveCycleNight modus not active")
+        return False
+    elif dateTime[3] == 3 and dateTime[4] < 30:
+        print("valveCycleNight modus active")
+        return True
+    elif dateTime[3] == 3 and dateTime[4] >= 30:
+        print("valveCycleNight modus not active")
+        return False
+    elif dateTime[3] == 5 and dateTime[4] < 30:
+        print("valveCycleNight modus active")
+        return True
+    elif dateTime[3] == 5 and dateTime[4] >= 30:
+        print("valveCycleNight modus not active")
+        return False
+    else:
+        print("valveCycleNight modus not active")
+        return False
+
+
+def cookingTimes():
+    
+    # Update dateTime
+    dateTime = time.localtime(time.time() + utcOffset())
+
+    # Return True if valve cycle should start, otherwise return False
+    if dateTime[3] == 17 and dateTime[4] > 20:
+        print("cooking modus active")
+        return True
+    elif dateTime[3] == 17 and dateTime[4] > 50:
+        print("cooking modus not active")
+        return False
+    else:
+        print("Cooking modus not active")
+        return False
+
+
+
+
+
+
+
 
 
 
