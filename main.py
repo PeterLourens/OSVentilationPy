@@ -903,7 +903,7 @@ def valveCycleDay_logic():
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish fan speed
-    fanSpeed = "high"
+    fanSpeed = "medium"
     mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
@@ -1001,7 +1001,7 @@ def valveCycleNight_logic():
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish fan speed
-    fanSpeed = "high"
+    fanSpeed = "low"
     mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
