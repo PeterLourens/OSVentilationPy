@@ -898,7 +898,7 @@ def valveCycleDay_logic():
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish state of state machine
-    state = "manualHighSpeed"
+    state = "valveCycleDay"
     mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
@@ -996,7 +996,7 @@ def valveCycleNight_logic():
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish state of state machine
-    state = "manualHighSpeed"
+    state = "valveCycleNight"
     mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
@@ -1091,7 +1091,7 @@ def cooking_logic():
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish state of state machine
-    state = "manualHighSpeed"
+    state = "cooking"
     mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
