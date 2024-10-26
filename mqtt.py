@@ -1,22 +1,13 @@
 #from umqtt.simple import MQTTClient
 from robust import *
 from time import sleep
+from secrets import *
 
 import time
 
-global mqttServer
-global mqqtUser
-global mqttPass
-global ClientID
-
-mqttServer = '192.168.0.15'
-mqttUser = ''
-mqttPass = ''
-ClientID = "OSVentilationPy"
-
 def mqttConnect():
-    print('\nConnected to MQTT Broker "%s"' % (mqttServer))
-    client = MQTTClient(ClientID, mqttServer, 1883, mqttUser, mqttPass)
+    print('\nConnected to MQTT Broker "%s"' % (MQTT_SERVER))
+    client = MQTTClient(MQTT_CLIENT_ID, MQTT_SERVER, MQTT_PORT, MQTT_USER, MQTT_PASS)
     client.connect()
     return client
 
