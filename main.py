@@ -13,6 +13,7 @@ import micropython
 import os
 import machine
 import ntptime
+import requests
 
 #=========================================================================
 # Global variables
@@ -131,6 +132,7 @@ def init_logic():
         
         # Set fan speed to low
         print("Fan speed is low")
+        requests.get("FAN_SPEED_LOW_URL")
         
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
@@ -179,6 +181,7 @@ def day_logic():
         
         # Set fan speed to medium
         print("Fan speed is medium")
+        requests.get("FAN_SPEED_MEDIUM_URL")
 
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
@@ -281,6 +284,7 @@ def night_logic():
 
         # Set fan speed low
         print("Fan speed is low")
+        requests.get("FAN_SPEED_LOW_URL")
         
     # Code that executes continously during state 
     sleep(TRANSITION_DELAY)
@@ -376,6 +380,7 @@ def highCO2Day_logic():
         
         # Set fan speed to high
         print("Fan speed is high")
+        requests.get("FAN_SPEED_HIGH_URL")
     
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
@@ -470,6 +475,7 @@ def highCO2Night_logic():
         
         # Set fan speed to low
         print("Fan speed is low")
+        requests.get("FAN_SPEED_LOW_URL")
                
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
@@ -566,6 +572,7 @@ def manualHighSpeed_logic():
         
         # Set fan speed to high
         print("Fan speed is high")
+        requests.get("FAN_SPEED_HIGH_URL")
         
         # Start timer for auto switch off manual high speed
         manualHighSpeedTimerStart = time.ticks_ms()
@@ -679,6 +686,7 @@ def highRHDay_logic():
         
         # Set fan speed to low
         print("Fan speed is high")
+        requests.get("FAN_SPEED_HIGH_URL")
         
         # Start timer for auto switch off manual high speed
         highRHDayTimerStart = time.ticks_ms()
@@ -785,6 +793,7 @@ def highRHNight_logic():
         
         # Set fan speed to low
         print("Fan speed is low")
+        requests.get("FAN_SPEED_LOW_URL")
                
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
@@ -886,6 +895,7 @@ def valveCycleDay_logic():
         
         # Set fan speed to low
         print("Fan speed is medium")
+        requests.get("FAN_SPEED_MEDIUM_URL")
                
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
@@ -984,6 +994,7 @@ def valveCycleNight_logic():
         
         # Set fan speed to low
         print("Fan speed is low")
+        requests.get("FAN_SPEED_LOW_URL")
                
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
@@ -1079,6 +1090,7 @@ def cooking_logic():
         
         # Set fan speed to low
         print("Fan speed is high")
+        requests.get("FAN_SPEED_HIGH_URL")
                
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
