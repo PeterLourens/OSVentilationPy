@@ -28,18 +28,20 @@ def utcOffset():
         # Non Leap year
         print("\nNo leap year")
         dstStartDate = 90
-        dstEndDate = 300    
-
-    if (dateTime[7] > dstStartDate) and (dateTime[3] >=3) and (dateTime[7] <= dstEndDate) and (dateTime[3] >= 2):
+        dstEndDate = 300
+  
+    if dateTime[7] >= dstStartDate and dateTime[3] >= 3 and dateTime[7] <= dstEndDate and dateTime[3] <= 2:
         # DST
         utcOffset = 2 * 3600
+        print(dateTime)
         print("UTC offset is", utcOffset, "seconds")
+        return utcOffset
     else:
         # No DST
         utcOffset = 1 * 3600
-        print("UTC offset is", utcOffset, "seconds")    
-
-    return utcOffset
+        print(dateTime)
+        print("UTC offset is", utcOffset, "seconds")
+        return utcOffset
 
 def dayOfWeekToDay(dayOfWeek):
     # Array with names of the day. 1 is Monday, 6 is Sunday
