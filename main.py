@@ -23,20 +23,23 @@ global stateTransitionMatrix
 #=========================================================================
 # Constants
 #=========================================================================
-CO2_MAX_LEVEL = 1000												# Level where statemachine transitions from to CO2 
-CO2_MIN_LEVEL = 800													# Level where statemachine transitions from high CO2
-RH_MAX_LEVEL = 90													# Lvel where state machine transitions to high RH
-MQTT_QOS = 0														# MQTT QOS setting. QOS of 0 is appropriate as a measurment can be missed
-MQTT_SLEEP = 200 													# Sleep time after publish message
-SUBSCRIBE_TOPIC = b"zigbee2mqtt/Reading light switch/action"		# Topic to subscrie to for status remote control
-REMOTE_PUB_TOPIC = "zigbee2mqtt/Reading light switch/action"		# Topic for publishing status of remote control
-FANSPEED_PUB_TOPIC = "OSVentilationPy/operatingMode/fanSpeed" 		# Topic for publishing fanspeed
-STATEMACHINESTATE_PUB_TOPIC= "OSVentilationPy/operatingMode/state"	# Topic for publishing statemachine state
-TIMEOFDAY_PUB_TOPIC = "OSVentilationPy/operatingMode/time"			# Topic for publishing time of day (day or night)
-MANUALHIGHSPEED_TIME = 30*60*1000 									# Time manual high speed mode is active in ms
-HIGHRHDAY_TIME = 30*60*1000											# Time high RH speed mode is active in ms in day time
-HIGHRHNIGHT_TIME = 30*60*1000										# Time high RH speed mode is active in ms in night time
-TRANSITION_DELAY = 10												# Waiting time before continuing into state
+CO2_MAX_LEVEL = 1000						    						    # Level where statemachine transitions from to CO2 
+CO2_MIN_LEVEL = 800								    					    # Level where statemachine transitions from high CO2
+RH_MAX_LEVEL = 90									    				    # Lvel where state machine transitions to high RH
+MQTT_QOS = 0														        # MQTT QOS setting. QOS of 0 is appropriate as a measurment can be missed
+MQTT_SLEEP = 200 													        # Sleep time after publish message
+SUBSCRIBE_TOPIC = b"zigbee2mqtt/Reading light switch/action"	    	    # Topic to subscrie to for status remote control
+REMOTE_PUB_TOPIC = "zigbee2mqtt/Reading light switch/action"		        # Topic for publishing status of remote control
+FANSPEED_PUB_TOPIC = "OSVentilationPy/operatingMode/fanSpeed" 		        # Topic for publishing fanspeed
+STATEMACHINESTATE_PUB_TOPIC= "OSVentilationPy/operatingMode/state"	        # Topic for publishing statemachine state
+TIMEOFDAY_PUB_TOPIC = "OSVentilationPy/operatingMode/time"			        # Topic for publishing time of day (day or night)
+MANUALHIGHSPEED_TIME = 30*60*1000 									        # Time manual high speed mode is active in ms
+HIGHRHDAY_TIME = 30*60*1000										    	    # Time high RH speed mode is active in ms in day time
+HIGHRHNIGHT_TIME = 30*60*1000										        # Time high RH speed mode is active in ms in night time
+TRANSITION_DELAY = 10												        # Waiting time before continuing into state
+FAN_SPEED_LOW_URL = "http://192.168.40.74/api.html?vremotecmd=low"          # Fanspeed url using open source wifi control add-on module
+FAN_SPEED_MEDIUM_URL = "http://192.168.40.74/api.html?vremotecmd=medium"    
+FAN_SPEED_HIGH_URL = "http://192.168.40.74/api.html?vremotecmd=high"
 
 #=========================================================================
 # MQTT Connection
