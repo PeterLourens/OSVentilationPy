@@ -13,6 +13,8 @@ import micropython
 import os
 import machine
 import ntptime
+import network
+import socket
 import requests
 
 #=========================================================================
@@ -24,20 +26,20 @@ global stateTransitionMatrix
 #=========================================================================
 # Constants
 #=========================================================================
-CO2_MAX_LEVEL = 1000						    						    # Level where statemachine transitions from to CO2 
-CO2_MIN_LEVEL = 800								    					    # Level where statemachine transitions from high CO2
-RH_MAX_LEVEL = 90									    				    # Lvel where state machine transitions to high RH
-MQTT_QOS = 0														        # MQTT QOS setting. QOS of 0 is appropriate as a measurment can be missed
-MQTT_SLEEP = 200 													        # Sleep time after publish message
-SUBSCRIBE_TOPIC = b"zigbee2mqtt/Reading light switch/action"	    	    # Topic to subscrie to for status remote control
-REMOTE_PUB_TOPIC = "zigbee2mqtt/Reading light switch/action"		        # Topic for publishing status of remote control
-FANSPEED_PUB_TOPIC = "OSVentilationPy/operatingMode/fanSpeed" 		        # Topic for publishing fanspeed
-STATEMACHINESTATE_PUB_TOPIC= "OSVentilationPy/operatingMode/state"	        # Topic for publishing statemachine state
-TIMEOFDAY_PUB_TOPIC = "OSVentilationPy/operatingMode/time"			        # Topic for publishing time of day (day or night)
-MANUALHIGHSPEED_TIME = 30*60*1000 									        # Time manual high speed mode is active in ms
-HIGHRHDAY_TIME = 30*60*1000										    	    # Time high RH speed mode is active in ms in day time
-HIGHRHNIGHT_TIME = 30*60*1000										        # Time high RH speed mode is active in ms in night time
-TRANSITION_DELAY = 10												        # Waiting time before continuing into state
+CO2_MAX_LEVEL = 1000														# Level where statemachine transitions from to CO2 
+CO2_MIN_LEVEL = 800															# Level where statemachine transitions from high CO2
+RH_MAX_LEVEL = 90															# Lvel where state machine transitions to high RH
+MQTT_QOS = 0																# MQTT QOS setting. QOS of 0 is appropriate as a measurment can be missed
+MQTT_SLEEP = 200 															# Sleep time after publish message
+SUBSCRIBE_TOPIC = b"zigbee2mqtt/Reading light switch/action"				# Topic to subscrie to for status remote control
+REMOTE_PUB_TOPIC = "zigbee2mqtt/Reading light switch/action"				# Topic for publishing status of remote control
+FANSPEED_PUB_TOPIC = "OSVentilationPy/operatingMode/fanSpeed" 				# Topic for publishing fanspeed
+STATEMACHINESTATE_PUB_TOPIC= "OSVentilationPy/operatingMode/state"			# Topic for publishing statemachine state
+TIMEOFDAY_PUB_TOPIC = "OSVentilationPy/operatingMode/time"					# Topic for publishing time of day (day or night)
+MANUALHIGHSPEED_TIME = 30*60*1000 											# Time manual high speed mode is active in ms
+HIGHRHDAY_TIME = 30*60*1000													# Time high RH speed mode is active in ms in day time
+HIGHRHNIGHT_TIME = 30*60*1000												# Time high RH speed mode is active in ms in night time
+TRANSITION_DELAY = 10														# Waiting time before continuing into state
 FAN_SPEED_LOW_URL = "http://192.168.40.74/api.html?vremotecmd=low"          # Fanspeed url using open source wifi control add-on module
 FAN_SPEED_MEDIUM_URL = "http://192.168.40.74/api.html?vremotecmd=medium"    
 FAN_SPEED_HIGH_URL = "http://192.168.40.74/api.html?vremotecmd=high"
@@ -132,7 +134,7 @@ def init_logic():
         
         # Set fan speed to low
         print("Fan speed is low")
-        requests.get("FAN_SPEED_LOW_URL")
+        requests.get(FAN_SPEED_LOW_URL)
         
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
@@ -181,7 +183,7 @@ def day_logic():
         
         # Set fan speed to medium
         print("Fan speed is medium")
-        requests.get("FAN_SPEED_MEDIUM_URL")
+        requests.get(FAN_SPEED_MEDIUM_URL)
 
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
@@ -284,7 +286,7 @@ def night_logic():
 
         # Set fan speed low
         print("Fan speed is low")
-        requests.get("FAN_SPEED_LOW_URL")
+        requests.get(FAN_SPEED_LOW_URL)
         
     # Code that executes continously during state 
     sleep(TRANSITION_DELAY)
@@ -355,6 +357,9 @@ def night_logic():
     elif timeOfDay == "day":
         print("\nStateMachine transitions to day")
         stateMachine.force_transition_to(day)
+    elif timeOfDay == "night" and valveCycleTimesNight() == True:
+        print("\nStateMachine transitions to valveCycleNight")
+        stateMachine.force_transition_to(valveCycleDay)
     else:
         pass
 
@@ -380,7 +385,7 @@ def highCO2Day_logic():
         
         # Set fan speed to high
         print("Fan speed is high")
-        requests.get("FAN_SPEED_HIGH_URL")
+        requests.get(FAN_SPEED_HIGH_URL)
     
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
@@ -475,7 +480,7 @@ def highCO2Night_logic():
         
         # Set fan speed to low
         print("Fan speed is low")
-        requests.get("FAN_SPEED_LOW_URL")
+        requests.get(FAN_SPEED_LOW_URL)
                
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
@@ -572,7 +577,7 @@ def manualHighSpeed_logic():
         
         # Set fan speed to high
         print("Fan speed is high")
-        requests.get("FAN_SPEED_HIGH_URL")
+        requests.get(FAN_SPEED_HIGH_URL)
         
         # Start timer for auto switch off manual high speed
         manualHighSpeedTimerStart = time.ticks_ms()
@@ -686,7 +691,7 @@ def highRHDay_logic():
         
         # Set fan speed to low
         print("Fan speed is high")
-        requests.get("FAN_SPEED_HIGH_URL")
+        requests.get(FAN_SPEED_HIGH_URL)
         
         # Start timer for auto switch off manual high speed
         highRHDayTimerStart = time.ticks_ms()
@@ -793,7 +798,7 @@ def highRHNight_logic():
         
         # Set fan speed to low
         print("Fan speed is low")
-        requests.get("FAN_SPEED_LOW_URL")
+        requests.get(FAN_SPEED_LOW_URL)
                
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
@@ -895,7 +900,7 @@ def valveCycleDay_logic():
         
         # Set fan speed to low
         print("Fan speed is medium")
-        requests.get("FAN_SPEED_MEDIUM_URL")
+        requests.get(FAN_SPEED_MEDIUM_URL)
                
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
@@ -994,7 +999,7 @@ def valveCycleNight_logic():
         
         # Set fan speed to low
         print("Fan speed is low")
-        requests.get("FAN_SPEED_LOW_URL")
+        requests.get(FAN_SPEED_LOW_URL)
                
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
@@ -1090,7 +1095,7 @@ def cooking_logic():
         
         # Set fan speed to low
         print("Fan speed is high")
-        requests.get("FAN_SPEED_HIGH_URL")
+        requests.get(FAN_SPEED_HIGH_URL)
                
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
