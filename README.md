@@ -12,6 +12,14 @@
 * Power factor: 0.58
 * Weight: 3.5 kg
 
+## State Machine
+The ventilation system is based on a state machine library written by José Rullán in 2022. This is the state machine:
+
+![statemachine for OSVentilationPy](https://github.com/PeterLourens/OSVentilationPy/blob/main/design%20docs/statemachine.png)
+
+
+
+
 ## Initial state
 
 When the ventilation system starts, all valves should go to their default position and the fan at low (10%) speed. The default positions are:
