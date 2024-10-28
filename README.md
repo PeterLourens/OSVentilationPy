@@ -15,7 +15,7 @@
 ## State Machine
 The ventilation system is based on a state machine library written by José Rullán in 2022. This is the state machine:
 
-![statemachine for OSVentilationPy](https://github.com/PeterLourens/OSVentilationPy/blob/main/design%20docs/statemachine.png)
+![statemachine for OSVentilationPy](design%20docs/statemachine.png)
 
 
 
