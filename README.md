@@ -23,18 +23,18 @@ When the ventilation system starts, all valves should go to their default positi
 
 | Valve number | Room | valve position [%] | flow [m3/h] | High valve position [%] |
 | --- | ---| --- | --- | --- |
-| 0 | HR Kap | 3 | 5 | 20 |
-| 1 | Keuken | 3 | 5 | 20 |
-| 2 | Toliet | 3 | 5 | 20 |
+| 0 | HR Kap | 17 | 5 | 20 |
+| 1 | Keuken | 17 | 5 | 20 |
+| 2 | Toliet | 17 | 5 | 20 |
 | 3 | Not used | 0 | 0 | 0 |
 | 4 | Not used | 0 | 0 | 0 |
-| 5 | Wasruimte | 3 | 5 | 20 |
+| 5 | Wasruimte | 17 | 5 | 20 |
 | 6 | Badkamer | 100 | 60 | |
 | 7 | Not used | 0 | 0 | 0 |
-| 8 | Slaapkamer1 | 3 | 5 | 20 |
-| 9 | Slaapkamer 2 | 3 | 5 | 20 |
-| 10 | Slaapkamer 3 | 3 | 5 | 20 |
-| 11 | Slaapkamer 4 | 3 | 5 | 20 |
+| 8 | Slaapkamer1 | 17 | 5 | 20 |
+| 9 | Slaapkamer 2 | 17 | 5 | 20 |
+| 10 | Slaapkamer 3 | 17 | 5 | 20 |
+| 11 | Slaapkamer 4 | 17 | 5 | 20 |
 
 Fan:
 * Low: 20 -> 10% = 40 m3/h
@@ -56,14 +56,13 @@ Normal ventilation pattern:
 
 ### Temperature control
 
-No temperature control. Air is drawn in through the rosters in the windows which is an energy loss. 
+No temperature control. Air is drawn in through the rosters in the windows. 
 
 ### Humidity control
 
 Humidity is measured with two sensors. Conditions:
 
-* When both sensors indicate similar values (offset ?%) then the humidity cannot be influenced by the ventilation so no action is required.
-* When bathroom1 humidity is higher than the general humidity in the house then shower is on. Actions:
+* When bathroom1 humidity is higher than 90% then shower is on. Actions:
     * Fanspeed should be increased to high. 
     * All valves remain in the same position (bathroom1 is and remains 100% open, all other unchanged).
 
@@ -71,11 +70,11 @@ Humidity is measured with two sensors. Conditions:
 
 CO2 is measured with one sensor in the suction tube of the fan so it measures for all rooms. Conditions and actions:
 
-* When CO2 is high in daytime the ventilation should be increased. Actions:
+* When CO2 is high (1000ppm) in daytime the ventilation should be increased. Actions:
     * Valves remain in same position 
-    * fanspeed should be increased to high until CO2 level has decreased to XXX ppm.
+    * fanspeed should be increased to high until CO2 level has decreased to 800 ppm.
 * When CO2 is high during night time, the bedrooms should be ventilated more. Actions 
-    * Open the valves to 100% of all bedrooms (not office). 
+    * Open the valves to 100% of all bedrooms (but not in the office). 
     * Fanspeed remains on low
 
 		
