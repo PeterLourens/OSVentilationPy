@@ -359,7 +359,7 @@ def night_logic():
         stateMachine.force_transition_to(day)
     elif timeOfDay == "night" and valveCycleTimesNight() == True:
         print("\nStateMachine transitions to valveCycleNight")
-        stateMachine.force_transition_to(valveCycleDay)
+        stateMachine.force_transition_to(valveCycleNight)
     else:
         pass
 
