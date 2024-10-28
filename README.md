@@ -17,10 +17,7 @@ The ventilation system is based on a state machine library written by José Rull
 
 ![statemachine for OSVentilationPy](design%20docs/statemachine.png)
 
-
-
-
-## Initial state
+# Initial state
 
 When the ventilation system starts, all valves should go to their default position and the fan at low (10%) speed. The default positions are:
 
@@ -29,11 +26,11 @@ When the ventilation system starts, all valves should go to their default positi
 | 0 | HR Kap | 3 | 5 | 20 |
 | 1 | Keuken | 3 | 5 | 20 |
 | 2 | Toliet | 3 | 5 | 20 |
-| 3 | | | | |
-| 4 | | | | |
+| 3 | Not used | 0 | 0 | 0 |
+| 4 | Not used | 0 | 0 | 0 |
 | 5 | Wasruimte | 3 | 5 | 20 |
 | 6 | Badkamer | 100 | 60 | |
-| 7 | | | | |
+| 7 | Not used | 0 | 0 | 0 |
 | 8 | Slaapkamer1 | 3 | 5 | 20 |
 | 9 | Slaapkamer 2 | 3 | 5 | 20 |
 | 10 | Slaapkamer 3 | 3 | 5 | 20 |
