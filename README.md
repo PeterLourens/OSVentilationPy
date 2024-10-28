@@ -21,20 +21,20 @@ The ventilation system is based on a state machine library written by José Rull
 
 When the ventilation system starts, all valves should go to their default position and the fan at low (10%) speed. The default positions are:
 
-| Valve number | Room | valve position [%] | flow [m3/h] | High valve position [%] |
+| Valve number | Room | valve position | flow [m3/h] | High valve position [%] |
 | --- | ---| --- | --- | --- |
-| 0 | HR Kap | 17 | 5 | 20 |
-| 1 | Keuken | 17 | 5 | 20 |
-| 2 | Toliet | 17 | 5 | 20 |
+| 0 | HR Kap | 4 | 5 | 20 |
+| 1 | Keuken | 4 | 5 | 20 |
+| 2 | Toliet | 4 | 5 | 20 |
 | 3 | Not used | 0 | 0 | 0 |
 | 4 | Not used | 0 | 0 | 0 |
-| 5 | Wasruimte | 17 | 5 | 20 |
+| 5 | Wasruimte | 4 | 5 | 20 |
 | 6 | Badkamer | 100 | 60 | |
 | 7 | Not used | 0 | 0 | 0 |
-| 8 | Slaapkamer1 | 17 | 5 | 20 |
-| 9 | Slaapkamer 2 | 17 | 5 | 20 |
-| 10 | Slaapkamer 3 | 17 | 5 | 20 |
-| 11 | Slaapkamer 4 | 17 | 5 | 20 |
+| 8 | Slaapkamer1 | 4 | 5 | 20 |
+| 9 | Slaapkamer 2 | 4 | 5 | 20 |
+| 10 | Slaapkamer 3 | 4 | 5 | 20 |
+| 11 | Slaapkamer 4 | 4 | 5 | 20 |
 
 Fan:
 * Low: 20 -> 10% = 40 m3/h
