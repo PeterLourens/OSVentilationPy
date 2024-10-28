@@ -29,7 +29,7 @@ When the ventilation system starts, all valves should go to their default positi
 | 3 | Not used | 0 | 0 | 0 |
 | 4 | Not used | 0 | 0 | 0 |
 | 5 | Wasruimte | 4 | 5 | 20 |
-| 6 | Badkamer | 100 | 60 | |
+| 6 | Badkamer | 24 | 60 | |
 | 7 | Not used | 0 | 0 | 0 |
 | 8 | Slaapkamer1 | 4 | 5 | 20 |
 | 9 | Slaapkamer 2 | 4 | 5 | 20 |
