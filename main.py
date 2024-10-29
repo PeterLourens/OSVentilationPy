@@ -5,6 +5,8 @@ from scd41 import SCD4X
 from sensors import *
 from mqtt import *
 from timefunctions import *
+from secrets import *
+from connect import *
 
 import time
 import gc
@@ -16,6 +18,7 @@ import ntptime
 import network
 import socket
 import requests
+import webrepl
 
 #=========================================================================
 # Global variables
@@ -31,6 +34,7 @@ CO2_MIN_LEVEL = 800															# Level where statemachine transitions from hi
 RH_MAX_LEVEL = 90															# Lvel where state machine transitions to high RH
 MQTT_QOS = 0																# MQTT QOS setting. QOS of 0 is appropriate as a measurment can be missed
 MQTT_SLEEP = 200 															# Sleep time after publish message
+REQUEST_SLEEP = 200
 SUBSCRIBE_TOPIC = b"zigbee2mqtt/Reading light switch/action"				# Topic to subscrie to for status remote control
 REMOTE_PUB_TOPIC = "zigbee2mqtt/Reading light switch/action"				# Topic for publishing status of remote control
 FANSPEED_PUB_TOPIC = "OSVentilationPy/operatingMode/fanSpeed" 				# Topic for publishing fanspeed
@@ -43,6 +47,13 @@ TRANSITION_DELAY = 10														# Waiting time before continuing into state
 FAN_SPEED_LOW_URL = "http://192.168.40.74/api.html?vremotecmd=low"          # Fanspeed url using open source wifi control add-on module
 FAN_SPEED_MEDIUM_URL = "http://192.168.40.74/api.html?vremotecmd=medium"    
 FAN_SPEED_HIGH_URL = "http://192.168.40.74/api.html?vremotecmd=high"
+
+#=========================================================================
+# Connect to WLAN
+#=========================================================================
+
+do_connect(secrets.SSID, secrets.WIFI_PASS)
+webrepl.start()
 
 #=========================================================================
 # MQTT Connection
@@ -118,10 +129,6 @@ def setValves():
 #=========================================================================
 stateMachine = StateMachine()
 
-#def state_machine_logic():  
-#    while True:
-#        stateMachine.run()
-
 # States Logic Functions
 def init_logic():
     # Referenced global variables
@@ -135,9 +142,18 @@ def init_logic():
         # Set fan speed to low
         print("Fan speed is low")
         requests.get(FAN_SPEED_LOW_URL)
+        time.sleep_ms(REQUEST_SLEEP)
         
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
+    
+    #Check WLAN connection
+    if check_connection() == True:
+        print("\nConnection to WIFI OK")
+    else:
+        print("\nNot connected")
+        do_connect(secrets.SSID, secrets.WIFI_PASS)
+        mqttReconnect()
     
     timeOfDay = evaluateDayOrNight()
     mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
@@ -184,9 +200,18 @@ def day_logic():
         # Set fan speed to medium
         print("Fan speed is medium")
         requests.get(FAN_SPEED_MEDIUM_URL)
+        time.sleep_ms(REQUEST_SLEEP)
 
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
+    
+    #Check WLAN connection
+    if check_connection() == True:
+        print("\nConnection to WIFI OK")
+    else:
+        print("\nNot connected")
+        do_connect(secrets.SSID, secrets.WIFI_PASS)
+        mqttReconnect()
     
     # Publish time to MQTT
     timeOfDay = evaluateDayOrNight()
@@ -287,9 +312,18 @@ def night_logic():
         # Set fan speed low
         print("Fan speed is low")
         requests.get(FAN_SPEED_LOW_URL)
+        time.sleep_ms(REQUEST_SLEEP)
         
     # Code that executes continously during state 
     sleep(TRANSITION_DELAY)
+    
+    #Check WLAN connection
+    if check_connection() == True:
+        print("\nConnection to WIFI OK")
+    else:
+        print("\nNot connected")
+        do_connect(secrets.SSID, secrets.WIFI_PASS)
+        mqttReconnect()
     
     # Set remote to off to sure remote start with off when transition to day or highCO2Day state. State of remote control is not a condition in night state
     remote = "off"
@@ -386,9 +420,18 @@ def highCO2Day_logic():
         # Set fan speed to high
         print("Fan speed is high")
         requests.get(FAN_SPEED_HIGH_URL)
+        time.sleep_ms(REQUEST_SLEEP)
     
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
+    
+    #Check WLAN connection
+    if check_connection() == True:
+        print("\nConnection to WIFI OK")
+    else:
+        print("\nNot connected")
+        do_connect(secrets.SSID, secrets.WIFI_PASS)
+        mqttReconnect()
 
     # Publish time to MQTT
     timeOfDay = evaluateDayOrNight()
@@ -481,9 +524,18 @@ def highCO2Night_logic():
         # Set fan speed to low
         print("Fan speed is low")
         requests.get(FAN_SPEED_LOW_URL)
+        time.sleep_ms(REQUEST_SLEEP)
                
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
+    
+    #Check WLAN connection
+    if check_connection() == True:
+        print("\nConnection to WIFI OK")
+    else:
+        print("\nNot connected")
+        do_connect(secrets.SSID, secrets.WIFI_PASS)
+        mqttReconnect()
     
     # Set remote to off to sure remote start with off when transition to day or highCO2Day state. State of remote control is not a condition in night state
     remote = "off"
@@ -578,12 +630,21 @@ def manualHighSpeed_logic():
         # Set fan speed to high
         print("Fan speed is high")
         requests.get(FAN_SPEED_HIGH_URL)
+        time.sleep_ms(REQUEST_SLEEP)
         
         # Start timer for auto switch off manual high speed
         manualHighSpeedTimerStart = time.ticks_ms()
         
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
+    
+    #Check WLAN connection
+    if check_connection() == True:
+        print("\nConnection to WIFI OK")
+    else:
+        print("\nNot connected")
+        do_connect(secrets.SSID, secrets.WIFI_PASS)
+        mqttReconnect()
     
     # Publish time to MQTT
     timeOfDay = evaluateDayOrNight()
@@ -692,12 +753,21 @@ def highRHDay_logic():
         # Set fan speed to low
         print("Fan speed is high")
         requests.get(FAN_SPEED_HIGH_URL)
+        time.sleep_ms(REQUEST_SLEEP)
         
         # Start timer for auto switch off manual high speed
         highRHDayTimerStart = time.ticks_ms()
         
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
+    
+    #Check WLAN connection
+    if check_connection() == True:
+        print("\nConnection to WIFI OK")
+    else:
+        print("\nNot connected")
+        do_connect(secrets.SSID, secrets.WIFI_PASS)
+        mqttReconnect()
     
     # Publish time to MQTT
     timeOfDay = evaluateDayOrNight()
@@ -799,9 +869,18 @@ def highRHNight_logic():
         # Set fan speed to low
         print("Fan speed is low")
         requests.get(FAN_SPEED_LOW_URL)
+        time.sleep_ms(REQUEST_SLEEP)
                
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
+    
+    #Check WLAN connection
+    if check_connection() == True:
+        print("\nConnection to WIFI OK")
+    else:
+        print("\nNot connected")
+        do_connect(secrets.SSID, secrets.WIFI_PASS)
+        mqttReconnect()
     
     # Set remote to off to sure remote start with off when transition to day or highCO2Day state. State of remote control is not a condition in night state
     remote = "off"
@@ -901,9 +980,18 @@ def valveCycleDay_logic():
         # Set fan speed to low
         print("Fan speed is medium")
         requests.get(FAN_SPEED_MEDIUM_URL)
+        time.sleep_ms(REQUEST_SLEEP)
                
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
+    
+    #Check WLAN connection
+    if check_connection() == True:
+        print("\nConnection to WIFI OK")
+    else:
+        print("\nNot connected")
+        do_connect(secrets.SSID, secrets.WIFI_PASS)
+        mqttReconnect()
     
     # Set remote to off to sure remote start with off when transition to day or highCO2Day state. State of remote control is not a condition in valve cycle day
     remote = "off"
@@ -1000,9 +1088,18 @@ def valveCycleNight_logic():
         # Set fan speed to low
         print("Fan speed is low")
         requests.get(FAN_SPEED_LOW_URL)
+        time.sleep_ms(REQUEST_SLEEP)
                
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
+    
+    #Check WLAN connection
+    if check_connection() == True:
+        print("\nConnection to WIFI OK")
+    else:
+        print("\nNot connected")
+        do_connect(secrets.SSID, secrets.WIFI_PASS)
+        mqttReconnect()
     
     # Set remote to off to sure remote start with off when transition to day or highCO2Day state. State of remote control is not a condition in valve cycle day
     remote = "off"
@@ -1096,9 +1193,18 @@ def cooking_logic():
         # Set fan speed to low
         print("Fan speed is high")
         requests.get(FAN_SPEED_HIGH_URL)
+        time.sleep_ms(REQUEST_SLEEP)
                
     # Code that executes continously during state
     sleep(TRANSITION_DELAY)
+    
+    #Check WLAN connection
+    if check_connection() == True:
+        print("\nConnection to WIFI OK")
+    else:
+        print("\nNot connected")
+        do_connect(secrets.SSID, secrets.WIFI_PASS)
+        mqttReconnect()
     
     # Set remote to off to sure remote start with off when transition to day or highCO2Day state. State of remote control is not a condition in valve cycle day
     remote = "off"
