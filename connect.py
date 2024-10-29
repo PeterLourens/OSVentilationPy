@@ -1,7 +1,11 @@
 import secrets
 import network
+from machine import Pin
+
+led = Pin(2, Pin.OUT)
 
 def do_connect(ssid, pwd):
+    global sta_if
     sta_if = network.WLAN(network.STA_IF)
     if not sta_if.isconnected():
         led.value(1)
@@ -14,12 +18,13 @@ def do_connect(ssid, pwd):
     led.value(0)
 
 def check_connection():
-    if sta_if.isconnected()
+    if sta_if.isconnected():
         print("WIFI is conected")
         return True
-    else
+    else:
         print("No WIFI connection")
         return False
 
 # Attempt to connect to WiFi network
-do_connect(secrets.SSID, secrets.WIFI_PASS)
+#do_connect(secrets.SSID, secrets.WIFI_PASS)
+
