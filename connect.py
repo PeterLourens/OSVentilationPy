@@ -14,7 +14,7 @@ def do_connect(ssid, pwd):
     led.value(0)
 
 def check_connection():
-    if sta_if.isconnected() == True
+    if sta_if.isconnected()
         print("WIFI is conected")
         return True
     else
