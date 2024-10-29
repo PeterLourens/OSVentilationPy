@@ -15,7 +15,7 @@ def do_connect(ssid, pwd):
 
 def check_connection():
     if sta_if.isconnected() == True
-        print("WIFI is still conected")
+        print("WIFI is conected")
         return True
     else
         print("No WIFI connection")
