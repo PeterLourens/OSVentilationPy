@@ -1,7 +1,7 @@
-import secrets.py
+import secrets
+import network
 
 def do_connect(ssid, pwd):
-    import network
     sta_if = network.WLAN(network.STA_IF)
     if not sta_if.isconnected():
         led.value(1)
@@ -12,10 +12,14 @@ def do_connect(ssid, pwd):
             pass
     print('network config:', sta_if.ifconfig())
     led.value(0)
- 
-# This file is executed on every boot (including wake-boot from deepsleep)
-#import esp
-#esp.osdebug(None)
- 
+
+def check_connection():
+    if sta_if.isconnected() == True
+        print("WIFI is still conected")
+        return True
+    else
+        print("No WIFI connection")
+        return False
+
 # Attempt to connect to WiFi network
 do_connect(secrets.SSID, secrets.WIFI_PASS)
