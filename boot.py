@@ -4,7 +4,8 @@ from sr74hc595_bitbang import SR74HC595_BITBANG
 from machine import Pin, SoftI2C
 from valveControl import clearOutputs
 
-#import secrets
+from secrets import *
+from connect import *
 
 clearOutputs()
 print("clearing outputs")
@@ -33,4 +34,5 @@ print("clearing outputs")
 
 #import webrepl
 #webrepl.start()
+
 
