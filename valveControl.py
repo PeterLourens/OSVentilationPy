@@ -85,33 +85,33 @@ def moveValve(requestedPosition, valveNumber):
     # Assign the correct I2C bus
     if valveNumber == 0 or valveNumber == 6:
         for i in range(4):
-            output[0][i] = pattern[i]
+            output[0][i] = pattern[i] <<4    #Shift pattern 4 bits
             output[1][i] = 0
             output[2][i] = 0
     elif valveNumber == 1 or valveNumber == 7:
         for i in range(4):
-            output[0][i] = pattern[i] <<4    #Shift pattern 4 bits 
+            output[0][i] = pattern[i] 
             output[1][i] = 0
             output[2][i] = 0
     elif valveNumber == 2 or valveNumber == 8:
         for i in range(4):
             output[0][i] = 0
-            output[1][i] = pattern[i]
+            output[1][i] = pattern[i] <<4
             output[2][i] = 0
     elif valveNumber == 3 or valveNumber == 9:
         for i in range(4):
             output[0][i] = 0
-            output[1][i] = pattern[i] <<4
+            output[1][i] = pattern[i]
             output[2][i] = 0
     elif valveNumber == 4 or valveNumber == 10:
         for i in range(4):
             output[0][i] = 0
-            output[1][i] = pattern[i]
+            output[1][i] = pattern[i] <<4
             output[2][i] = 0
     elif valveNumber == 5 or valveNumber == 11:
         for i in range(4):
             output[0][i] = 0
-            output[1][i] = pattern[i] <<4
+            output[1][i] = pattern[i]
             output[2][i] = 0
     else:
         pass
@@ -121,7 +121,7 @@ def moveValve(requestedPosition, valveNumber):
 
     #Write output sequence based on direction
     if valvePositionMove != 0:    # No need to do anything no move of valve is required
-        if direction == "open":
+        if direction == "close":
             for j in range(int(valvePositionMove) * CyclesPerRotation):
                 for i in range(0,4,1):
                     sr.latch()
@@ -129,7 +129,7 @@ def moveValve(requestedPosition, valveNumber):
                     sr.bits(output[1][i], 8)
                     sr.bits(output[0][i], 8)
                     time.sleep_ms(5)    # 5ms delay (200Hz switching time) for one step of the valve 
-        elif direction == "close":
+        elif direction == "open":
             for j in range(int(valvePositionMove) * CyclesPerRotation):
                 for i in range(3,-1,-1):
                     sr.latch()
