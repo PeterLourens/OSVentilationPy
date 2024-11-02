@@ -99,10 +99,10 @@ def valveCycleTimesDay():
     elif dateTime[3] == 16 and dateTime[4] >= 30:
         print("valveCycleDay modus not active")
         return False
-    elif dateTime[3] == 18 and dateTime[4] < 30:
+    elif dateTime[3] == 18 and dateTime[4] > 10 and dateTime[4] < 40:
         print("valveCycleDay modus active")
         return True
-    elif dateTime[3] == 18 and dateTime[4] >= 30:
+    elif dateTime[3] == 18 and dateTime[4] >= 40:
         print("valveCycleDay modus not active")
         return False
     if dateTime[3] == 20 and dateTime[4] < 30:
