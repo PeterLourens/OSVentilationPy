@@ -63,7 +63,6 @@ def moveValve(requestedPosition, valveNumber):
         newPosition = requestedPosition
     else:
         # Current position is the same requestedPosition so nothing to do
-        # direction = "close"
         valvePositionMove = 0
         newPosition = requestedPosition
     
@@ -82,15 +81,15 @@ def moveValve(requestedPosition, valveNumber):
     else:
         sr = SR74HC595_BITBANG(ser2, srclk2, rclk2)
 
-    # Assign the correct I2C bus
+    # Assign correct pattern to valvenumber
     if valveNumber == 0 or valveNumber == 6:
         for i in range(4):
-            output[0][i] = pattern[i] <<4    #Shift pattern 4 bits
+            output[0][i] = pattern[i] <<4
             output[1][i] = 0
             output[2][i] = 0
     elif valveNumber == 1 or valveNumber == 7:
         for i in range(4):
-            output[0][i] = pattern[i] 
+            output[0][i] = pattern[i]    #Shift pattern 4 bits 
             output[1][i] = 0
             output[2][i] = 0
     elif valveNumber == 2 or valveNumber == 8:
@@ -106,13 +105,13 @@ def moveValve(requestedPosition, valveNumber):
     elif valveNumber == 4 or valveNumber == 10:
         for i in range(4):
             output[0][i] = 0
-            output[1][i] = pattern[i] <<4
-            output[2][i] = 0
+            output[1][i] = 0
+            output[2][i] = pattern[i] <<4
     elif valveNumber == 5 or valveNumber == 11:
         for i in range(4):
             output[0][i] = 0
-            output[1][i] = pattern[i]
-            output[2][i] = 0
+            output[1][i] = 0
+            output[2][i] = pattern[i]
     else:
         pass
 
@@ -195,4 +194,5 @@ def checkValvePositionFile():
     else:
         print("\nValve status file not found. Creating new default one")
         defaultValvePositions()
+
 
