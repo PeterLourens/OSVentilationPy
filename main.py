@@ -1044,9 +1044,9 @@ def valveCycleDay_logic():
         mqttReconnect()
     
     # Set remote to off to sure remote start with off when transition to day or highCO2Day state. State of remote control is not a condition in valve cycle day
-    remote = "off"
-    mqttPublish(mqttClient, remote, REMOTE_PUB_TOPIC, int(MQTT_QOS))
-    time.sleep_ms(MQTT_SLEEP)
+    #remote = "off"
+    #mqttPublish(mqttClient, remote, REMOTE_PUB_TOPIC, int(MQTT_QOS))
+    #time.sleep_ms(MQTT_SLEEP)
     
     # Publish time to MQTT
     timeOfDay = evaluateDayOrNight()
@@ -1257,9 +1257,9 @@ def cooking_logic():
         mqttReconnect()
     
     # Set remote to off to sure remote start with off when transition to day or highCO2Day state. State of remote control is not a condition in valve cycle day
-    remote = "off"
-    mqttPublish(mqttClient, remote, REMOTE_PUB_TOPIC, int(MQTT_QOS))
-    time.sleep_ms(MQTT_SLEEP)
+    #remote = "off"
+    #mqttPublish(mqttClient, remote, REMOTE_PUB_TOPIC, int(MQTT_QOS))
+    #time.sleep_ms(MQTT_SLEEP)
     
     # Publish time to MQTT
     timeOfDay = evaluateDayOrNight()
@@ -1384,6 +1384,8 @@ while True:
 #_thread.start_new_thread(state_machine_logic, ())
 
 #state_machine_logic()
+
+
 
 
 
