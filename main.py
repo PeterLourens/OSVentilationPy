@@ -1092,9 +1092,13 @@ def valveCycleDay_logic():
         mqttPublish(mqttClient, str(valvePosition), topic, int(MQTT_QOS))
         time.sleep_ms(MQTT_SLEEP)
     
-    f.close() 
-   
-    # No need to check remote control as manual high speed is not availble in the valvec cycle day
+    f.close()
+
+    # Check for status of remote control. The signal is maintained (so remains on when pressed 1 and off when 0)
+    if True:
+        mqttClient.check_msg()
+        time.sleep(1)
+        print("\nremoteState is:", remoteState)
     
     # Print conditions
     print("\nTime of day is:",timeOfDay, ", CO2 is:",SCD41Reading[2], ", RH bathroom is:",DHT22Reading[1], ", remote state is:",remoteState)
