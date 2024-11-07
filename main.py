@@ -156,26 +156,17 @@ def init_logic():
         mqttReconnect()
     
     timeOfDay = evaluateDayOrNight()
-    try:
-        mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish state of state machine
     state = "init"
-    try:
-        mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish fan speed
     fanSpeed = "low"
-    try:
-        mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # StateMachine can only transition to either "day" or "night" states
@@ -203,10 +194,7 @@ def day_logic():
             
             # Publish to mqtt server
             topic = "OSVentilationPy/position/valve" + str(i)
-            try:
-                mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
-            except OSError:
-                pass
+            mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
             time.sleep_ms(MQTT_SLEEP)
         
         # Set fan speed to medium
@@ -227,26 +215,17 @@ def day_logic():
     
     # Publish time to MQTT
     timeOfDay = evaluateDayOrNight()
-    try:
-        mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish state of state machine
     state = "day"
-    try:
-        mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish fan speed
     fanSpeed = "medium"
-    try:
-        mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     #Read sensors, functions return array with readings
@@ -264,10 +243,7 @@ def day_logic():
         for key in measurement:
             #print(key + ':', measurement[key])
             topic = "OSVentilationPy/" + sensorType + "/" + key 
-            try:
-                mqttPublish(mqttClient, str(measurement[key]), topic, int(MQTT_QOS))
-            except OSError:
-                pass
+            mqttPublish(mqttClient, str(measurement[key]), topic, int(MQTT_QOS))
             time.sleep_ms(MQTT_SLEEP)
     
     # Read valve position of requested valve from file and publish valve positions to MQTT
@@ -278,20 +254,14 @@ def day_logic():
         topic = "OSVentilationPy/position/valve" + str(i)
         valvePosition = valvePositions[("valve" + str(i))]
         print("\nTopic is:", topic, "ValvePosition is:", valvePosition)
-        try:
-            mqttPublish(mqttClient, str(valvePosition), topic, int(MQTT_QOS))
-        except OSError:
-            pass
+        mqttPublish(mqttClient, str(valvePosition), topic, int(MQTT_QOS))
         time.sleep_ms(MQTT_SLEEP)
     
     f.close()
     
     # Check for status of remote control. The signal is maintained (so remains on when pressed 1 and off when 0)
     if True:
-        try:
-            mqttClient.check_msg()
-        except OSError:
-            pass
+        mqttClient.check_msg()
         time.sleep(1)
         print("\nremoteState is:", remoteState)
     
@@ -336,10 +306,7 @@ def night_logic():
             
             # Publish to mqtt server
             topic = "OSVentilationPy/position/valve" + str(i)
-            try:
-                mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
-            except OSError:
-                pass
+            mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
             time.sleep_ms(MQTT_SLEEP)
 
         # Set fan speed low
@@ -360,34 +327,22 @@ def night_logic():
     
     # Set remote to off to sure remote start with off when transition to day or highCO2Day state. State of remote control is not a condition in night state
     remote = "off"
-    try:
-        mqttPublish(mqttClient, remote, REMOTE_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, remote, REMOTE_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish time to MQTT
     timeOfDay = evaluateDayOrNight()
-    try:
-        mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish state of state machine
     state = "night"
-    try:
-        mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish fan speed
     fanSpeed = "low"
-    try:
-        mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     #Read sensors, return array with readings
@@ -405,10 +360,7 @@ def night_logic():
         for key in measurement:
             #print(key + ':', measurement[key])
             topic = "OSVentilationPy/" + sensorType + "/" + key 
-            try:
-                mqttPublish(mqttClient, str(measurement[key]), topic, int(MQTT_QOS))
-            except OSError:
-                pass
+            mqttPublish(mqttClient, str(measurement[key]), topic, int(MQTT_QOS))
             time.sleep_ms(MQTT_SLEEP)
 
     # Read valve position of requested valve from file and publish valve positions to MQTT
@@ -419,10 +371,7 @@ def night_logic():
         topic = "OSVentilationPy/position/valve" + str(i)
         valvePosition = valvePositions[("valve" + str(i))]
         print("\nTopic is:", topic, "ValvePosition is:", valvePosition)
-        try:
-            mqttPublish(mqttClient, str(valvePosition), topic, int(MQTT_QOS))
-        except OSError:
-            pass
+        mqttPublish(mqttClient, str(valvePosition), topic, int(MQTT_QOS))
         time.sleep_ms(MQTT_SLEEP)
     
     f.close()
@@ -465,18 +414,12 @@ def highCO2Day_logic():
             
             # Publish to mqtt server
             topic = "OSVentilationPy/position/valve" + str(i)
-            try:
-                mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
-            except OSError:
-                pass
+            mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
             time.sleep_ms(MQTT_SLEEP)
         
         # Set fan speed to high
         print("Fan speed is high")
-        try:
-            requests.get(FAN_SPEED_HIGH_URL)
-        except OSError:
-            pass
+        requests.get(FAN_SPEED_HIGH_URL)
         time.sleep_ms(REQUEST_SLEEP)
     
     # Code that executes continously during state
@@ -492,26 +435,17 @@ def highCO2Day_logic():
 
     # Publish time to MQTT
     timeOfDay = evaluateDayOrNight()
-    try:
-        mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish state of state machine
     state = "highCO2Day"
-    try:
-        mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish fan speed
     fanSpeed = "high"
-    try:
-        mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     #Read sensors, return array with readings
@@ -529,10 +463,7 @@ def highCO2Day_logic():
         for key in measurement:
             #print(key + ':', measurement[key])
             topic = "OSVentilationPy/" + sensorType + "/" + key 
-            try:
-                mqttPublish(mqttClient, str(measurement[key]), topic, int(MQTT_QOS))
-            except OSError:
-                pass
+            mqttPublish(mqttClient, str(measurement[key]), topic, int(MQTT_QOS))
             time.sleep_ms(MQTT_SLEEP)
 
     # Read valve position of requested valve from file and publish valve positions to MQTT
@@ -543,20 +474,14 @@ def highCO2Day_logic():
         topic = "OSVentilationPy/position/valve" + str(i)
         valvePosition = valvePositions[("valve" + str(i))]
         print("\nTopic is:", topic, "ValvePosition is:", valvePosition)
-        try:
-            mqttPublish(mqttClient, str(valvePosition), topic, int(MQTT_QOS))
-        except OSError:
-            pass
+        mqttPublish(mqttClient, str(valvePosition), topic, int(MQTT_QOS))
         time.sleep_ms(MQTT_SLEEP)
     
     f.close()
     
     # Check for status of remote control. The signal is maintained (so remains on when pressed 1 and off when 0)
     if True:
-        try:
-            mqttClient.check_msg()
-        except OSError:
-            pass
+        mqttClient.check_msg()
         time.sleep(1)
         print("\nremoteState is:", remoteState)
 
@@ -593,18 +518,12 @@ def highCO2Night_logic():
             
             # Publish to mqtt server
             topic = "OSVentilationPy/position/valve" + str(i)
-            try:
-                mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
-            except OSError:
-                pass
+            mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
             time.sleep_ms(MQTT_SLEEP)
         
         # Set fan speed to low
         print("Fan speed is low")
-        try:
-            requests.get(FAN_SPEED_LOW_URL)
-        except OSError:
-            pass
+        requests.get(FAN_SPEED_LOW_URL)
         time.sleep_ms(REQUEST_SLEEP)
                
     # Code that executes continously during state
@@ -620,34 +539,22 @@ def highCO2Night_logic():
     
     # Set remote to off to sure remote start with off when transition to day or highCO2Day state. State of remote control is not a condition in night state
     remote = "off"
-    try:
-        mqttPublish(mqttClient, remote, REMOTE_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, remote, REMOTE_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish time to MQTT
     timeOfDay = evaluateDayOrNight()
-    try:
-        mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish state of state machine
     state = "highCO2Night"
-    try:
-        mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish fan speed
     fanSpeed = "low"
-    try:
-        mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     #Read sensors, return array with readings
@@ -665,10 +572,7 @@ def highCO2Night_logic():
         for key in measurement:
             #print(key + ':', measurement[key])
             topic = "OSVentilationPy/" + sensorType + "/" + key 
-            try:
-                mqttPublish(mqttClient, str(measurement[key]), topic, int(MQTT_QOS))
-            except OSError:
-                pass
+            mqttPublish(mqttClient, str(measurement[key]), topic, int(MQTT_QOS))
             time.sleep_ms(MQTT_SLEEP)
 
     # Read valve position of requested valve from file and publish valve positions to MQTT
@@ -679,10 +583,7 @@ def highCO2Night_logic():
         topic = "OSVentilationPy/position/valve" + str(i)
         valvePosition = valvePositions[("valve" + str(i))]
         print("\nTopic is:", topic, "ValvePosition is:", valvePosition)
-        try:
-            mqttPublish(mqttClient, str(valvePosition), topic, int(MQTT_QOS))
-        except OSError:
-            pass
+        mqttPublish(mqttClient, str(valvePosition), topic, int(MQTT_QOS))
         time.sleep_ms(MQTT_SLEEP)
     
     f.close()
@@ -723,18 +624,12 @@ def manualHighSpeed_logic():
             
             # Publish to mqtt server
             topic = "OSVentilationPy/position/valve" + str(i)
-            try:
-                mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
-            except OSError:
-                pass
+            mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
             time.sleep_ms(MQTT_SLEEP)
         
         # Set fan speed to high
         print("Fan speed is high")
-        try:
-            requests.get(FAN_SPEED_HIGH_URL)
-        except OSError:
-            pass
+        requests.get(FAN_SPEED_HIGH_URL)
         time.sleep_ms(REQUEST_SLEEP)
         
         # Start timer for auto switch off manual high speed
@@ -753,26 +648,17 @@ def manualHighSpeed_logic():
     
     # Publish time to MQTT
     timeOfDay = evaluateDayOrNight()
-    try:
-        mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish state of state machine
     state = "manualHighSpeed"
-    try:
-        mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish fan speed
     fanSpeed = "high"
-    try:
-        mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     #Read sensors, return array with readings
@@ -790,10 +676,7 @@ def manualHighSpeed_logic():
         for key in measurement:
             #print(key + ':', measurement[key])
             topic = "OSVentilationPy/" + sensorType + "/" + key 
-            try:
-                mqttPublish(mqttClient, str(measurement[key]), topic, int(MQTT_QOS))
-            except OSError:
-                pass
+            mqttPublish(mqttClient, str(measurement[key]), topic, int(MQTT_QOS))
             time.sleep_ms(MQTT_SLEEP)
 
     # Read valve position of requested valve from file and publish valve positions to MQTT
@@ -804,10 +687,7 @@ def manualHighSpeed_logic():
         topic = "OSVentilationPy/position/valve" + str(i)
         valvePosition = valvePositions[("valve" + str(i))]
         print("\nTopic is:", topic, "ValvePosition is:", valvePosition)
-        try:
-            mqttPublish(mqttClient, str(valvePosition), topic, int(MQTT_QOS))
-        except OSError:
-            pass
+        mqttPublish(mqttClient, str(valvePosition), topic, int(MQTT_QOS))
         time.sleep_ms(MQTT_SLEEP)
     
     f.close()
@@ -818,18 +698,12 @@ def manualHighSpeed_logic():
     print("\nElapsed time:", elapsedTime)
     if elapsedTime > int(MANUALHIGHSPEED_TIME):
         remote = "off"
-        try:
-            mqttPublish(mqttClient, remote , REMOTE_PUB_TOPIC, int(MQTT_QOS))
-        except OSError:
-            pass
+        mqttPublish(mqttClient, remote , REMOTE_PUB_TOPIC, int(MQTT_QOS))
         time.sleep_ms(MQTT_SLEEP)
     
     # Check for status of remote control. The signal is maintained (so remains on when pressed 1 and off when 0)
     if True:
-        try:
-            mqttClient.check_msg()
-        except OSError:
-            pass
+        mqttClient.check_msg()
         time.sleep(1)
         print("\nremoteState is:", remoteState)  
 
@@ -873,18 +747,12 @@ def highRHDay_logic():
             
             # Publish to mqtt server
             topic = "OSVentilationPy/position/valve" + str(i)
-            try:
-                mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
-            except OSError:
-                pass
+            mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
             time.sleep_ms(MQTT_SLEEP)
         
         # Set fan speed to low
         print("Fan speed is high")
-        try:
-            requests.get(FAN_SPEED_HIGH_URL)
-        except OSError:
-            pass
+        requests.get(FAN_SPEED_HIGH_URL)
         time.sleep_ms(REQUEST_SLEEP)
         
         # Start timer for auto switch off manual high speed
@@ -903,26 +771,17 @@ def highRHDay_logic():
     
     # Publish time to MQTT
     timeOfDay = evaluateDayOrNight()
-    try:
-        mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish state of state machine
     state = "highRHDay"
-    try:
-        mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish fan speed
     fanSpeed = "high"
-    try:
-        mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     #Read sensors, return array with readings
@@ -940,10 +799,7 @@ def highRHDay_logic():
         for key in measurement:
             #print(key + ':', measurement[key])
             topic = "OSVentilationPy/" + sensorType + "/" + key 
-            try:
-                mqttPublish(mqttClient, str(measurement[key]), topic, int(MQTT_QOS))
-            except OSError:
-                pass
+            mqttPublish(mqttClient, str(measurement[key]), topic, int(MQTT_QOS))
             time.sleep_ms(MQTT_SLEEP)
 
     # Read valve position of requested valve from file and publish valve positions to MQTT
@@ -954,20 +810,14 @@ def highRHDay_logic():
         topic = "OSVentilationPy/position/valve" + str(i)
         valvePosition = valvePositions[("valve" + str(i))]
         print("\nTopic is:", topic, "ValvePosition is:", valvePosition)
-        try:
-            mqttPublish(mqttClient, str(valvePosition), topic, int(MQTT_QOS))
-        except OSError:
-            pass
+        mqttPublish(mqttClient, str(valvePosition), topic, int(MQTT_QOS))
         time.sleep_ms(MQTT_SLEEP)
     
     f.close()
     
     # Check for status of remote control. The signal is maintained (so remains on when pressed 1 and off when 0)
     if True:
-        try:
-            mqttClient.check_msg()
-        except OSError:
-            pass
+        mqttClient.check_msg()
         time.sleep(1)
         print("\nremoteState is:", remoteState)
     
@@ -1013,18 +863,12 @@ def highRHNight_logic():
             
             # Publish to mqtt server
             topic = "OSVentilationPy/position/valve" + str(i)
-            try:
-                mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
-            except OSError:
-                pass
+            mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
             time.sleep_ms(MQTT_SLEEP)
         
         # Set fan speed to low
         print("Fan speed is low")
-        try:
-            requests.get(FAN_SPEED_LOW_URL)
-        except OSError:
-            pass
+        requests.get(FAN_SPEED_LOW_URL)
         time.sleep_ms(REQUEST_SLEEP)
                
     # Code that executes continously during state
@@ -1040,34 +884,22 @@ def highRHNight_logic():
     
     # Set remote to off to sure remote start with off when transition to day or highCO2Day state. State of remote control is not a condition in night state
     remote = "off"
-    try:
-        mqttPublish(mqttClient, remote, REMOTE_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, remote, REMOTE_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish time to MQTT
     timeOfDay = evaluateDayOrNight()
-    try:
-        mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish state of state machine
     state = "manualHighSpeed"
-    try:
-        mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish fan speed
     fanSpeed = "high"
-    try:
-        mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     #Read sensors, return array with readings
@@ -1085,10 +917,7 @@ def highRHNight_logic():
         for key in measurement:
             #print(key + ':', measurement[key])
             topic = "OSVentilationPy/" + sensorType + "/" + key 
-            try:
-                mqttPublish(mqttClient, str(measurement[key]), topic, int(MQTT_QOS))
-            except OSError:
-                pass
+            mqttPublish(mqttClient, str(measurement[key]), topic, int(MQTT_QOS))
             time.sleep_ms(MQTT_SLEEP)
 
     # Read valve position of requested valve from file and publish valve positions to MQTT
@@ -1099,10 +928,7 @@ def highRHNight_logic():
         topic = "OSVentilationPy/position/valve" + str(i)
         valvePosition = valvePositions[("valve" + str(i))]
         print("\nTopic is:", topic, "ValvePosition is:", valvePosition)
-        try:
-            mqttPublish(mqttClient, str(valvePosition), topic, int(MQTT_QOS))
-        except OSError:
-            pass
+        mqttPublish(mqttClient, str(valvePosition), topic, int(MQTT_QOS))
         time.sleep_ms(MQTT_SLEEP)
     
     f.close()
@@ -1148,18 +974,12 @@ def valveCycleDay_logic():
             
             # Publish to mqtt server
             topic = "OSVentilationPy/position/valve" + str(i)
-            try:
-                mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
-            except OSError:
-                pass
+            mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
             time.sleep_ms(MQTT_SLEEP)
         
         # Set fan speed to low
         print("Fan speed is medium")
-        try:
-            requests.get(FAN_SPEED_MEDIUM_URL)
-        except OSError:
-            pass
+        requests.get(FAN_SPEED_MEDIUM_URL)
         time.sleep_ms(REQUEST_SLEEP)
                
     # Code that executes continously during state
@@ -1174,35 +994,23 @@ def valveCycleDay_logic():
         mqttReconnect()
     
     # Set remote to off to sure remote start with off when transition to day or highCO2Day state. State of remote control is not a condition in valve cycle day
-    remote = "off"
-    try:
-        mqttPublish(mqttClient, remote, REMOTE_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
-    time.sleep_ms(MQTT_SLEEP)
+    #remote = "off"
+    #mqttPublish(mqttClient, remote, REMOTE_PUB_TOPIC, int(MQTT_QOS))
+    #time.sleep_ms(MQTT_SLEEP)
     
     # Publish time to MQTT
     timeOfDay = evaluateDayOrNight()
-    try:
-        mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish state of state machine
     state = "valveCycleDay"
-    try:
-        mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish fan speed
     fanSpeed = "medium"
-    try:
-        mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     #Read sensors, return array with readings
@@ -1220,10 +1028,7 @@ def valveCycleDay_logic():
         for key in measurement:
             #print(key + ':', measurement[key])
             topic = "OSVentilationPy/" + sensorType + "/" + key 
-            try:
-                mqttPublish(mqttClient, str(measurement[key]), topic, int(MQTT_QOS))
-            except OSError:
-                pass
+            mqttPublish(mqttClient, str(measurement[key]), topic, int(MQTT_QOS))
             time.sleep_ms(MQTT_SLEEP)
 
     # Read valve position of requested valve from file and publish valve positions to MQTT
@@ -1234,15 +1039,16 @@ def valveCycleDay_logic():
         topic = "OSVentilationPy/position/valve" + str(i)
         valvePosition = valvePositions[("valve" + str(i))]
         print("\nTopic is:", topic, "ValvePosition is:", valvePosition)
-        try:
-            mqttPublish(mqttClient, str(valvePosition), topic, int(MQTT_QOS))
-        except OSError:
-            pass
+        mqttPublish(mqttClient, str(valvePosition), topic, int(MQTT_QOS))
         time.sleep_ms(MQTT_SLEEP)
     
-    f.close() 
-   
-    # No need to check remote control as manual high speed is not availble in the valvec cycle day
+    f.close()
+
+    # Check for status of remote control. The signal is maintained (so remains on when pressed 1 and off when 0)
+    if True:
+        mqttClient.check_msg()
+        time.sleep(1)
+        print("\nremoteState is:", remoteState)
     
     # Print conditions
     print("\nTime of day is:",timeOfDay, ", CO2 is:",SCD41Reading[2], ", RH bathroom is:",DHT22Reading[1], ", remote state is:",remoteState)
@@ -1280,18 +1086,12 @@ def valveCycleNight_logic():
             
             # Publish to mqtt server
             topic = "OSVentilationPy/position/valve" + str(i)
-            try:
-                mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
-            except OSError:
-                pass
+            mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
             time.sleep_ms(MQTT_SLEEP)
         
         # Set fan speed to low
         print("Fan speed is low")
-        try:
-            requests.get(FAN_SPEED_LOW_URL)
-        except OSError:
-            pass
+        requests.get(FAN_SPEED_LOW_URL)
         time.sleep_ms(REQUEST_SLEEP)
                
     # Code that executes continously during state
@@ -1307,34 +1107,22 @@ def valveCycleNight_logic():
     
     # Set remote to off to sure remote start with off when transition to day or highCO2Day state. State of remote control is not a condition in valve cycle day
     remote = "off"
-    try:
-        mqttPublish(mqttClient, remote, REMOTE_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, remote, REMOTE_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish time to MQTT
     timeOfDay = evaluateDayOrNight()
-    try:
-        mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish state of state machine
     state = "valveCycleNight"
-    try:
-        mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish fan speed
     fanSpeed = "low"
-    try:
-        mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     #Read sensors, return array with readings
@@ -1352,10 +1140,7 @@ def valveCycleNight_logic():
         for key in measurement:
             #print(key + ':', measurement[key])
             topic = "OSVentilationPy/" + sensorType + "/" + key 
-            try:
-                mqttPublish(mqttClient, str(measurement[key]), topic, int(MQTT_QOS))
-            except OSError:
-                pass
+            mqttPublish(mqttClient, str(measurement[key]), topic, int(MQTT_QOS))
             time.sleep_ms(MQTT_SLEEP)
 
     # Read valve position of requested valve from file and publish valve positions to MQTT
@@ -1366,10 +1151,7 @@ def valveCycleNight_logic():
         topic = "OSVentilationPy/position/valve" + str(i)
         valvePosition = valvePositions[("valve" + str(i))]
         print("\nTopic is:", topic, "ValvePosition is:", valvePosition)
-        try:
-            mqttPublish(mqttClient, str(valvePosition), topic, int(MQTT_QOS))
-        except OSError:
-            pass
+        mqttPublish(mqttClient, str(valvePosition), topic, int(MQTT_QOS))
         time.sleep_ms(MQTT_SLEEP)
     
     f.close() 
@@ -1409,18 +1191,12 @@ def cooking_logic():
             
             # Publish to mqtt server
             topic = "OSVentilationPy/position/valve" + str(i)
-            try:
-                mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
-            except OSError:
-                pass
+            mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
             time.sleep_ms(MQTT_SLEEP)
         
         # Set fan speed to low
         print("Fan speed is high")
-        try:
-            requests.get(FAN_SPEED_HIGH_URL)
-        except OSError:
-            pass
+        requests.get(FAN_SPEED_HIGH_URL)
         time.sleep_ms(REQUEST_SLEEP)
                
     # Code that executes continously during state
@@ -1435,35 +1211,23 @@ def cooking_logic():
         mqttReconnect()
     
     # Set remote to off to sure remote start with off when transition to day or highCO2Day state. State of remote control is not a condition in valve cycle day
-    remote = "off"
-    try:
-        mqttPublish(mqttClient, remote, REMOTE_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
-    time.sleep_ms(MQTT_SLEEP)
+    #remote = "off"
+    #mqttPublish(mqttClient, remote, REMOTE_PUB_TOPIC, int(MQTT_QOS))
+    #time.sleep_ms(MQTT_SLEEP)
     
     # Publish time to MQTT
     timeOfDay = evaluateDayOrNight()
-    try:
-        mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish state of state machine
     state = "cooking"
-    try:
-        mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, state, STATEMACHINESTATE_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     # Publish fan speed
     fanSpeed = "high"
-    try:
-        mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
-    except OSError:
-        pass
+    mqttPublish(mqttClient, fanSpeed, FANSPEED_PUB_TOPIC, int(MQTT_QOS))
     time.sleep_ms(MQTT_SLEEP)
     
     #Read sensors, return array with readings
@@ -1481,10 +1245,7 @@ def cooking_logic():
         for key in measurement:
             #print(key + ':', measurement[key])
             topic = "OSVentilationPy/" + sensorType + "/" + key 
-            try:
-                mqttPublish(mqttClient, str(measurement[key]), topic, int(MQTT_QOS))
-            except OSError:
-                pass
+            mqttPublish(mqttClient, str(measurement[key]), topic, int(MQTT_QOS))
             time.sleep_ms(MQTT_SLEEP)
 
     # Read valve position of requested valve from file and publish valve positions to MQTT
@@ -1495,10 +1256,7 @@ def cooking_logic():
         topic = "OSVentilationPy/position/valve" + str(i)
         valvePosition = valvePositions[("valve" + str(i))]
         print("\nTopic is:", topic, "ValvePosition is:", valvePosition)
-        try:
-            mqttPublish(mqttClient, str(valvePosition), topic, int(MQTT_QOS))
-        except OSError:
-            pass
+        mqttPublish(mqttClient, str(valvePosition), topic, int(MQTT_QOS))
         time.sleep_ms(MQTT_SLEEP)
     
     f.close() 
@@ -1576,14 +1334,4 @@ print("Today is",dayOfWeekToDay(dateTime[6]))
 # Main Loop:
 while True:
     stateMachine.run()
-
-
-
-
-
-
-
-
-
-
 
