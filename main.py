@@ -10,15 +10,12 @@ from connect import *
 
 import time
 import gc
-import _thread
 import micropython
 import os
 import machine
-import ntptime
 import network
 import socket
 import requests
-import webrepl
 
 #=========================================================================
 # Global variables
@@ -52,18 +49,25 @@ FAN_SPEED_HIGH_URL = "http://192.168.40.74/api.html?vremotecmd=high"
 # Connect to WLAN
 #=========================================================================
 
-do_connect(secrets.SSID, secrets.WIFI_PASS)
+#do_connect(secrets.SSID, secrets.WIFI_PASS)
 #webrepl.start()
+
+#=========================================================================
+# System stats
+#=========================================================================
+
+gc.collect()
 
 #=========================================================================
 # MQTT Connection
 #=========================================================================
+
+remoteState="off"
+
 try:
     mqttClient = mqttConnect()
 except OSError as e:
     mqttReconnect()
-
-remoteState="off"
 
 # Call back function for remote control state
 def sub_cb(topic, msg):
@@ -104,25 +108,6 @@ print("Actual time", actual_time)
 print("\nOpening state transistionMatrix")
 with open('stateTransitionMatrix.json') as f:
     stateMachineMatrix = json.loads(f.read())
-
-#=========================================================================
-# System stats
-#=========================================================================
-def df():
-  s = os.statvfs('//')
-  return ('{0} MB'.format((s[0]*s[3])/1048576))
-
-def free(full=False):
-  gc.collect()
-  F = gc.mem_free()
-  A = gc.mem_alloc()
-  T = F+A
-  P = '{0:.2f}%'.format(F/T*100)
-  if not full: return P
-  else : return ('Total:{0} Free:{1} ({2})'.format(T,F,P))
-
-def setValves():
-    pass
 
 #=========================================================================
 # Statemachine
@@ -797,7 +782,6 @@ def highRHDay_logic():
         time.sleep_ms(MQTT_SLEEP)
     
         for key in measurement:
-            #print(key + ':', measurement[key])
             topic = "OSVentilationPy/" + sensorType + "/" + key 
             mqttPublish(mqttClient, str(measurement[key]), topic, int(MQTT_QOS))
             time.sleep_ms(MQTT_SLEEP)
@@ -992,12 +976,7 @@ def valveCycleDay_logic():
         print("\nNot connected")
         do_connect(secrets.SSID, secrets.WIFI_PASS)
         mqttReconnect()
-    
-    # Set remote to off to sure remote start with off when transition to day or highCO2Day state. State of remote control is not a condition in valve cycle day
-    #remote = "off"
-    #mqttPublish(mqttClient, remote, REMOTE_PUB_TOPIC, int(MQTT_QOS))
-    #time.sleep_ms(MQTT_SLEEP)
-    
+     
     # Publish time to MQTT
     timeOfDay = evaluateDayOrNight()
     mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
@@ -1084,7 +1063,7 @@ def valveCycleNight_logic():
             moveValve(requestedPosition, i)
             clearOutputs()
             
-            # Publish to mqtt server
+            # Publish to mqtt
             topic = "OSVentilationPy/position/valve" + str(i)
             mqttPublish(mqttClient, str(requestedPosition) , topic, int(MQTT_QOS))
             time.sleep_ms(MQTT_SLEEP)
@@ -1210,11 +1189,6 @@ def cooking_logic():
         do_connect(secrets.SSID, secrets.WIFI_PASS)
         mqttReconnect()
     
-    # Set remote to off to sure remote start with off when transition to day or highCO2Day state. State of remote control is not a condition in valve cycle day
-    #remote = "off"
-    #mqttPublish(mqttClient, remote, REMOTE_PUB_TOPIC, int(MQTT_QOS))
-    #time.sleep_ms(MQTT_SLEEP)
-    
     # Publish time to MQTT
     timeOfDay = evaluateDayOrNight()
     mqttPublish(mqttClient, timeOfDay, TIMEOFDAY_PUB_TOPIC, int(MQTT_QOS))
@@ -1299,13 +1273,6 @@ cooking = stateMachine.add_state(cooking_logic)
 # Main program
 # ===========================================================================================
 
-# Systems stats
-disk = df()
-mem = free()
-
-print("\nDisk usage: ", disk)
-print("Memory free: ", mem)
-
 # Check if valvePosition file is present an correct
 checkValvePositionFile()
 
@@ -1334,4 +1301,3 @@ print("Today is",dayOfWeekToDay(dateTime[6]))
 # Main Loop:
 while True:
     stateMachine.run()
-
