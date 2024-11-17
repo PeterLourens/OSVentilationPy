@@ -8,7 +8,9 @@ from secrets import *
 from connect import *
 
 clearOutputs()
-print("clearing outputs")
+print("\nclearing outputs")
+
+do_connect(secrets.SSID, secrets.WIFI_PASS)
 
 #led = Pin(2, Pin.OUT)
 
@@ -34,5 +36,3 @@ print("clearing outputs")
 
 #import webrepl
 #webrepl.start()
-
-
