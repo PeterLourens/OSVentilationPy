@@ -585,7 +585,7 @@ def highCO2Night_logic():
     elif timeOfDay == "day" and SCD41Reading[2] < int(CO2_MIN_LEVEL):
         print("\nStateMachine transitions to Day")
         stateMachine.force_transition_to(day)
-    elif timeOfDay == "day" and SCD41Reading[2] > int(CO2_MAX_LEVEL):
+    elif timeOfDay == "day" and SCD41Reading[2] > int(CO2_MIN_LEVEL):
         print("\nStateMachine transitions to highCO2Day")
         stateMachine.force_transition_to(highCO2Day)
     else:
